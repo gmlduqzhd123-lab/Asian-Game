@@ -34,14 +34,19 @@
         }
         .action-anim { animation: floatAction 2.5s ease-in-out infinite; }
         
-        /* 세련된 스크롤바 (모바일 글자 잘림 방지용) */
+        /* 세련된 커스텀 스크롤바 */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; margin: 10px 0; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.6); }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="flex flex-col h-screen relative">
+
+    <!-- 🌟 저작권 문구 (화면 우측 하단 고정) -->
+    <div class="fixed bottom-2 right-3 text-slate-500/70 text-xs md:text-sm font-bold z-50 pointer-events-none tracking-wide">
+        ⓒ 2026. Made by. 엽쌤
+    </div>
 
     <!-- 상단 네비게이션 -->
     <nav class="bg-slate-800 p-3 md:p-4 shadow-lg z-10 flex flex-col md:flex-row justify-between items-center gap-3 shrink-0 w-full">
@@ -111,9 +116,9 @@
                         <p id="anim-guide" class="text-slate-300 font-bold text-sm md:text-lg text-center bg-black/40 px-4 md:px-6 py-2 md:py-3 rounded-full border border-slate-600 w-11/12 max-w-lg break-keep shrink-0 shadow-inner">준비선에 서서 과녁을 조준하세요!</p>
                     </div>
 
-                    <!-- 📺 버튼 태그 대신 기본 <a href> 태그를 사용하여 모바일 팝업 차단 완벽 회피 -->
+                    <!-- 📺 버튼 태그. 유튜브 즉시 강제 재생 -->
                     <div class="w-full bg-slate-900 p-4 border-t border-slate-700 flex flex-col gap-2 mt-auto shrink-0">
-                        <h4 class="text-yellow-400 font-bold text-xs md:text-base mb-1 text-center">📺 관련 영상 2가지 (클릭 시 유튜브 즉시 재생)</h4>
+                        <h4 class="text-yellow-400 font-bold text-xs md:text-base mb-1 text-center">📺 관련 영상 (클릭 시 유튜브 즉시 재생)</h4>
                         <div id="youtube-links-container" class="flex flex-col gap-2">
                             <!-- JS 동적 생성 -->
                         </div>
@@ -131,7 +136,8 @@
                 </div>
             </div>
         </div>
-        <button onclick="flipCard()" class="mt-4 md:mt-8 px-8 md:px-10 py-3 md:py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all shrink-0">오늘의 미션 상세 보기! 🚀</button>
+        <!-- 💡 버튼 ID 부여 및 텍스트 동적 변경 설정 -->
+        <button id="btn-flip" onclick="flipCard()" class="mt-4 md:mt-8 px-8 md:px-10 py-3 md:py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all shrink-0">오늘의 미션 상세 보기! 🚀</button>
     </section>
 
     <!-- 2. 역할 뽑기 룰렛 -->
@@ -165,7 +171,7 @@
                 <button onclick="addScore('B')" id="btn-score-B" class="z-10 w-11/12 md:w-4/5 h-14 sm:h-20 md:h-28 bg-red-600 hover:bg-red-500 active:bg-red-700 rounded-xl md:rounded-3xl text-xl sm:text-2xl md:text-4xl font-black-han shadow-[0_6px_0_rgb(127,29,29)] md:shadow-[0_8px_0_rgb(127,29,29)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
             </div>
         </div>
-        <!-- 타이머 패널 모바일 최적화 -->
+        <!-- 타이머 패널 -->
         <div class="mt-3 md:mt-4 mx-auto w-[95%] max-w-4xl bg-slate-800 p-3 md:p-4 rounded-xl md:rounded-2xl border-2 md:border-4 border-slate-600 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 z-30 shrink-0">
             <span id="timer-display" class="text-4xl sm:text-5xl md:text-6xl font-black-han text-yellow-400 w-full sm:w-32 md:w-40 text-center shrink-0">00:00</span>
             <div class="flex flex-row w-full gap-2">
@@ -187,9 +193,7 @@
 
         const ytBase = "https://www.youtube.com/watch?v=";
 
-        // 100% 작동하는 최신 리얼 비디오 아이디! 절대 안막히는 최신 영상들
         const sportEvents = {
-            // 1. 표적/타겟형
             archery: { animIcon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", guideText: "준비선에 서서 과녁을 집중해서 조준하세요!", missionTitle: "훌라후프 양궁", bgColor: "from-yellow-600 to-red-700", roles: [{ name: "슈터 🏹", color: "red" }, { name: "기록원 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1",
                 youtubeLinks: [ { text: "🥇 양궁 국가대표 짜릿한 하이라이트", url: ytBase+"3nB-m4BkA9c" }, { text: "🏹 양궁 선수들의 표적 명중 묘기 영상", url: ytBase+"PkadSv8xrqw" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 훌라후프 3개(대/중/소), 콩주머니(팀별 5개)</p><p>✅ <b>세팅:</b> 바닥에 훌라후프를 겹쳐 과녁을 만들고, 3m 거리에 투척선을 긋습니다.</p><p>✅ <b>진행:</b> 투척선 뒤에서 콩주머니를 던집니다. 팀원 모두 번갈아가며 던집니다.</p><p>✅ <b>점수:</b> 가장 안쪽 3점, 중간 2점, 바깥쪽 1점! 선을 밟고 던지면 0점입니다.</p></div>" },
@@ -203,49 +207,45 @@
                 youtubeLinks: [ { text: "🏀 농구 자유투 성공률 높이는 비법", url: ytBase+"ztyEepDNk0o" }, { text: "🗑️ K-농구만의 독특한 백보드 뱅크슛 효과", url: ytBase+"5Hkd5vnmqCY" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 이면지로 뭉친 종이공 여러 개, 깨끗한 휴지통 또는 바구니</p><p>✅ <b>세팅:</b> 벽 앞에 휴지통(골대)을 두고 3m 거리에 자유투 라인을 긋습니다.</p><p>✅ <b>진행:</b> 1분 동안 팀원들이 번갈아 가며 슛을 쏩니다.</p><p>✅ <b>점수:</b> 깔끔하게 들어가면 1점, 벽이나 칠판을 맞히고 튕겨 들어가면(뱅크슛) 2점!</p></div>" },
 
-            // 2. 네트/필드형
             teqball: { animIcon: "🎈", bgIcon: "🏓", title: "테크볼 (책상 풍선)", guideText: "발 대신 손과 머리를 사용해 풍선을 넘기세요!", missionTitle: "책상 풍선 테크볼", bgColor: "from-cyan-600 to-blue-800", roles: [{ name: "공격수 🎈", color: "cyan" }, { name: "수비수 🛡️", color: "pink" }, { name: "주심 ⚖️", color: "slate" }], scoreLabel: "득점 +1",
                 youtubeLinks: [ { text: "🥇 국제 탁구대회 미친 10구 이상 랠리", url: ytBase+"RA2bJCV8SbY" }, { text: "⚽ 발로 하는 탁구? 화려한 연고전 축구", url: ytBase+"e0Wh1VXPDgE" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 둥근 풍선, 마스킹 테이프</p><p>✅ <b>세팅:</b> 교실 책상 2~4개를 붙여 큰 탁구대를 만들고 중앙에 네트를 테이프로 표시합니다.</p><p>✅ <b>진행:</b> 2:2로 서서 손바닥과 머리로 풍선을 쳐서 상대방 책상 위로 넘깁니다.</p><p>✅ <b>규칙:</b> 한 사람이 풍선을 연속 3번 칠 수 없으며, 풍선이 바닥에 떨어지면 실점!</p></div>" },
-            volleyball: { animIcon: "👐", bgIcon: "🏐", title: "배구 (보자기 협동)", guideText: "팀원들과 동시에 '하나, 둘, 셋!' 맞춰보세요!", missionTitle: "보자기 협동 배구", bgColor: "from-pink-600 to-rose-800", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!",
+            volleyball: { animIcon: "👐", bgIcon: "🏐", title: "배구 (보자기 협동)", guideText: "다 같이 '하나, 둘, 셋!' 맞춰보세요!", missionTitle: "보자기 협동 배구", bgColor: "from-pink-600 to-rose-800", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!",
                 youtubeLinks: [ { text: "🏐 배구 스파이크와 공중동작 연습법", url: ytBase+"yVCoAGuJ8GM" }, { text: "🤝 도쿄올림픽 배드민턴 전설의 랠리", url: ytBase+"3KTaV3Vs4AU" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 큰 보자기 또는 낙하산 천, 소프트 배구공, 고무줄 네트</p><p>✅ <b>세팅:</b> 4명이 한 조가 되어 보자기의 네 모서리를 팽팽하게 잡습니다.</p><p>✅ <b>진행:</b> 보자기 중앙에 공을 올리고 일제히 당겨서 공을 공중으로 띄웁니다.</p><p>✅ <b>미션:</b> 네트 너머 상대 진영으로 공을 넘겨야 하며, 호흡이 안 맞으면 날아갑니다!</p></div>" },
-            badminton: { animIcon: "🏸", bgIcon: "🎈", title: "배드민턴 (풍선 셔틀콕)", guideText: "풍선이 떨어지기 전에 부드럽게 쳐요!", missionTitle: "풍선 배드민턴 랠리", bgColor: "from-green-600 to-teal-800", roles: [{ name: "전위 🏸", color: "green" }, { name: "후위 🏃", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "랠리 성공!",
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 큰 보자기 또는 낙하산 천, 소프트 배구공, 고무줄 네트</p><p>✅ <b>세팅:</b> 4명이 한 조가 되어 보자기의 네 모서리를 팽팽하게 잡습니다.</p><p>✅ <b>진행:</b> 보자기 중앙에 공을 올리고 일제히 당겨서 공을 공중으로 띄웁니다.</p><p>✅ <b>미션:</b> 고무줄 네트 너머 상대 진영으로 공을 넘겨야 하며, 호흡이 안 맞으면 날아갑니다!</p></div>" },
+            badminton: { animIcon: "🏸", bgIcon: "🎈", title: "배드민턴 (풍선 셔틀콕)", guideText: "바닥에 떨어지기 전에 부드럽게 쳐요!", missionTitle: "풍선 배드민턴 랠리", bgColor: "from-green-600 to-teal-800", roles: [{ name: "전위 🏸", color: "green" }, { name: "후위 🏃", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "랠리 성공!",
                 youtubeLinks: [ { text: "🥇 올림픽 배드민턴 숨막히는 여자복식 랠리", url: ytBase+"3KTaV3Vs4AU" }, { text: "🏸 스파이크 두려움을 극복하는 체육수업", url: ytBase+"yVCoAGuJ8GM" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 풍선, 하드보드지 또는 얇고 튼튼한 책(임시 라켓)</p><p>✅ <b>세팅:</b> 1:1 또는 2:2로 마주 보고 섭니다. 네트가 없어도 됩니다.</p><p>✅ <b>진행:</b> 책 라켓으로 풍선을 셔틀콕 삼아 떨어뜨리지 않고 랠리를 이어갑니다.</p><p>✅ <b>목표:</b> 스매싱 금지! 팀원과 협동하여 연속 20번 주고받으면 미션 클리어!</p></div>" },
             soccer: { animIcon: "⚽", bgIcon: "🎳", title: "축구 (페트병 볼링)", guideText: "발 안쪽으로 정확하게 밀어 차세요!", missionTitle: "페트병 볼링 슈팅", bgColor: "from-blue-700 to-indigo-900", roles: [{ name: "키커 ⚽", color: "blue" }, { name: "골키퍼 🧤", color: "yellow" }, { name: "볼보이 🏃", color: "slate" }], scoreLabel: "스트라이크!",
                 youtubeLinks: [ { text: "⚽ 2022 연고전 축구 경기 하이라이트", url: ytBase+"e0Wh1VXPDgE" }, { text: "⚽ 2025 연고전 축구 골 폭풍 하이라이트", url: ytBase+"BXfR2w_ruGQ" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 빈 페트병 10개(물을 조금 넣어 쓰러지기 좋게 함), 소프트 축구공</p><p>✅ <b>세팅:</b> 벽 앞에 페트병을 볼링핀처럼 삼각형으로 세우고 5m 슈팅 라인을 만듭니다.</p><p>✅ <b>진행:</b> 소프트 축구공을 발 안쪽(인사이드 킥)으로 정확하게 차서 핀을 쓰러뜨립니다.</p><p>✅ <b>점수:</b> 쓰러진 페트병 1개당 1점! 파워보다는 정중앙을 맞히는 정확도가 핵심입니다.</p></div>" },
 
-            // 3. 투기/경쟁형
-            judo: { animIcon: "🤝", bgIcon: "🥋", title: "유도 (손바닥 씨름)", guideText: "하체를 고정하고 상대방 힘을 역이용하세요!", missionTitle: "안전 손바닥 씨름", bgColor: "from-indigo-700 to-purple-900", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!",
+            judo: { animIcon: "🤝", bgIcon: "🥋", title: "유도 (손바닥 씨름)", guideText: "하체를 고정하고 페인트 모션을 쓰세요!", missionTitle: "안전 손바닥 씨름", bgColor: "from-indigo-700 to-purple-900", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!",
                 youtubeLinks: [ { text: "🥇 세계챔피언 김민종 압도적 유도 한판승", url: ytBase+"4Q5FpeTDwZA" }, { text: "🥋 국가대표 선수의 숨막히는 전술", url: ytBase+"4Q5FpeTDwZA" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 매트 위에서 두 사람이 한 팔 간격으로 마주보고 발을 굳게 고정합니다.</p><p>✅ <b>진행:</b> 두 손바닥만 사용하여 상대방의 손을 밀어냅니다.</p><p>✅ <b>규칙:</b> 손바닥 외에 몸을 잡거나 때리면 반칙! 피하기 동작(페인트)은 허용됩니다.</p><p>✅ <b>승리:</b> 상대가 중심을 잃고 발이 바닥에서 조금이라도 떨어지면 한판 승!</p></div>" },
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 매트 위에서 두 사람이 마주보고 서서 두 발을 굳게 고정합니다.</p><p>✅ <b>진행:</b> 두 발을 고정한 채 서로의 손바닥만 밀어냅니다.</p><p>✅ <b>규칙:</b> 손바닥 외에 다른 몸 부위를 잡으면 반칙! 피하기 동작은 허용됩니다.</p><p>✅ <b>승리:</b> 상대가 중심을 잃고 발이 바닥에서 조금이라도 움직이면 한판 승!</p></div>" },
             fencing: { animIcon: "🤺", bgIcon: "🥖", title: "펜싱 (스펀지 검투사)", guideText: "빠른 스텝으로 치고 빠지며 찌르세요!", missionTitle: "백업 스펀지 검투사", bgColor: "from-slate-700 to-blue-900", roles: [{ name: "공격수 🤺", color: "red" }, { name: "수비수 🛡️", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "TOUCH +1",
                 youtubeLinks: [ { text: "🥇 오상욱 국가대표 펜싱 폭풍 하이라이트", url: ytBase+"McxI8L9M1mI" }, { text: "🤺 오상욱 펜싱 경기 찌르기 명장면", url: ytBase+"McxI8L9M1mI" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 수영장 백업(스펀지 막대) 2개, 찍찍이 타겟 2개</p><p>✅ <b>세팅:</b> 배나 가슴 부위에 벨크로 타겟을 단단히 붙입니다.</p><p>✅ <b>규칙:</b> 스펀지 검을 들고 펜싱 스텝으로 다가가 상대의 타겟을 정확히 찌릅니다.</p><p>✅ <b>주의:</b> 배트처럼 위에서 아래로 세게 휘두르면 즉시 경고 및 퇴장입니다!</p></div>" },
-            taekwondo: { animIcon: "🥋", bgIcon: "🎈", title: "태권도 (풍선 발차기)", guideText: "다리를 뻗어 풍선을 경쾌하게 타격하세요!", missionTitle: "정확한 풍선 발차기", bgColor: "from-red-700 to-red-900", roles: [{ name: "태극전사 🥋", color: "red" }, { name: "미트잡이 👐", color: "blue" }, { name: "심판 💯", color: "yellow" }], scoreLabel: "타격 성공!",
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 수영장 백업(스펀지 막대) 2개, 찍찍이 타겟 2개</p><p>✅ <b>세팅:</b> 조끼나 배 부위에 벨크로 타겟을 단단히 붙입니다.</p><p>✅ <b>규칙:</b> 스펀지 검을 들고 펜싱 스텝으로 다가가 상대방의 타겟을 정확히 찌릅니다.</p><p>✅ <b>주의:</b> 배트처럼 위에서 아래로 세게 휘두르면 즉시 퇴장입니다!</p></div>" },
+            taekwondo: { animIcon: "🥋", bgIcon: "🎈", title: "태권도 (풍선 발차기)", guideText: "다리를 뻗어 풍선을 타격하세요!", missionTitle: "정확한 풍선 발차기", bgColor: "from-red-700 to-red-900", roles: [{ name: "태극전사 🥋", color: "red" }, { name: "미트잡이 👐", color: "blue" }, { name: "심판 💯", color: "yellow" }], scoreLabel: "타격 성공!",
                 youtubeLinks: [ { text: "🥇 태권도에서 가장 강력한 5가지 발차기", url: ytBase+"DpSXMH98L_g" }, { text: "🥋 돌려차기, 턴차기 폼 교정 튜토리얼", url: ytBase+"DpSXMH98L_g" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 실이 묶인 풍선 1개</p><p>✅ <b>진행:</b> 짝꿍이 줄이 매달린 풍선을 적당한 높이(가슴 부분)로 들고 대기합니다.</p><p>✅ <b>미션:</b> 돌려차기 또는 앞차기 폼으로 풍선을 빵! 소리 나게 타격합니다.</p><p>✅ <b>안전:</b> 친구 손을 다치지 않도록 주의하며 풍선 가장자리만 정확히 노리세요!</p></div>" },
-
-            // 4. 기록/체력형
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 실이 묶인 풍선 1개</p><p>✅ <b>진행:</b> 짝꿍이 줄이 매달린 풍선을 적당한 높이로 들고 대기합니다.</p><p>✅ <b>미션:</b> 돌려차기 또는 앞차기 폼으로 풍선을 빵! 소리 나게 타격합니다.</p><p>✅ <b>안전:</b> 친구 손을 차지 않도록 주의하며 풍선 가장자리만 정확히 노리세요!</p></div>" },
+            
             weightlifting: { animIcon: "📚", bgIcon: "🏋️", title: "역도 (플랭크 버티기)", guideText: "바른 자세를 유지하며 코어로 버티세요!", missionTitle: "인내심 플랭크 챌린지", bgColor: "from-gray-800 to-black", roles: [{ name: "선수 🏋️", color: "red" }, { name: "타임키퍼 ⏱️", color: "yellow" }, { name: "응원단 📣", color: "blue" }], scoreLabel: "버티기 성공!",
                 youtubeLinks: [ { text: "🏋️ 코어 폭발! 25초 플랭크 챌린지", url: ytBase+"J0hPTi0qT7o" }, { text: "🏌️ 부상 방지를 위한 골프 코어 훈련법", url: ytBase+"V3XewKgYB20" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>진행:</b> 매트 위에서 바른 플랭크 자세를 취하거나 양팔을 벌리고 책을 듭니다.</p><p>✅ <b>규칙:</b> 엉덩이가 심하게 내려가거나 뻗은 팔이 툭 떨어지면 즉시 탈락!</p><p>✅ <b>승리:</b> 올바른 폼을 덜덜 떨며 유지한 팀의 '최후의 1인'이 승리합니다.</p><p>✅ <b>팁:</b> 선생님이나 응원단이 옆에서 숫자를 세어주면 훨씬 오래 버틸 수 있습니다!</p></div>" },
-            equestrian: { animIcon: "🐎", bgIcon: "🏇", title: "승마 (장애물 릴레이)", guideText: "두 사람의 스피드와 호흡을 맞추세요!", missionTitle: "훌라후프 승마 릴레이", bgColor: "from-green-700 to-emerald-900", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!",
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>진행:</b> 매트 위에서 바른 플랭크 자세를 취하거나 양팔을 벌리고 무거운 책을 듭니다.</p><p>✅ <b>규칙:</b> 엉덩이가 심하게 내려가거나 뻗은 팔이 툭 떨어지면 즉시 탈락!</p><p>✅ <b>승리:</b> 올바른 폼을 덜덜 떨며 유지한 '최후의 1인'이 승리합니다.</p><p>✅ <b>팁:</b> 선생님이나 응원단이 옆에서 박수를 쳐주면 버티는 시간이 길어집니다!</p></div>" },
+            equestrian: { animIcon: "🐎", bgIcon: "🏇", title: "승마 (훌라후프 릴레이)", guideText: "두 사람의 스피드와 호흡을 맞추세요!", missionTitle: "훌라후프 승마 릴레이", bgColor: "from-green-700 to-emerald-900", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!",
                 youtubeLinks: [ { text: "🐎 학생 승마 기초 고삐 조종술 훈련", url: ytBase+"LepDL0bOw7k" }, { text: "🚧 육상 스피드를 올리는 보강 운동", url: ytBase+"7nrNWuKd5e4" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 큰 훌라후프 안에 2명이 앞뒤로 들어갑니다. (앞: 말, 뒤: 기수)</p><p>✅ <b>미션:</b> 둘이 훌라후프를 잡고 콘 장애물을 지그재그로 넘습니다.</p><p>✅ <b>페널티:</b> 달리는 도중 훌라후프를 놓치거나 콘을 쓰러뜨리면 제자리 3초 대기!</p><p>✅ <b>릴레이:</b> 반환점을 돌아와서 다음 주자에게 훌라후프를 넘겨주면 성공입니다.</p></div>" },
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 큰 훌라후프 안에 2명이 앞뒤로 들어갑니다. (앞: 말, 뒤: 기수)</p><p>✅ <b>미션:</b> 둘이 훌라후프를 잡고 콘 장애물을 지그재그로 넘습니다.</p><p>✅ <b>페널티:</b> 달리는 도중 훌라후프를 놓치거나 콘을 쓰러뜨리면 제자리 3초 대기!</p><p>✅ <b>릴레이:</b> 반환점을 돌아와서 다음 조에게 훌라후프를 넘겨줍니다.</p></div>" },
             hurdle: { animIcon: "🚧", bgIcon: "🏃", title: "허들 (미니콘 뛰어넘기)", guideText: "리듬감 있게 콘을 뛰어넘으세요!", missionTitle: "미니 허들 육상 달리기", bgColor: "from-yellow-700 to-red-700", roles: [{ name: "스프린터 🏃", color: "red" }, { name: "콘 세팅 🚧", color: "yellow" }, { name: "기록관 ⏱️", color: "blue" }], scoreLabel: "통과 +1",
                 youtubeLinks: [ { text: "🚧 자세 교정에 좋은 미니 허들 10가지 훈련", url: ytBase+"7nrNWuKd5e4" }, { text: "🏃 키가 커지는 신나는 점프 미니 허들", url: ytBase+"KCrNV-EyUBc" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 바닥에 1m 간격으로 낮은 미니 콘(접시콘이나 종이컵) 5개를 세팅합니다.</p><p>✅ <b>미션:</b> 스피드를 유지하면서 콘을 사뿐하게 뛰어넘어 반환점을 돌아옵니다.</p><p>✅ <b>감점:</b> 도약하다 콘을 밟거나 쓰러뜨리면 최종 기록에 +2초 추가!</p><p>✅ <b>팁:</b> 두 발을 모아 폴짝 뛰지 말고 런닝맨처럼 한 발씩 리듬을 타며 건너가세요!</p></div>" },
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 바닥에 1m 간격으로 낮은 미니 콘(허들) 5개를 세팅합니다.</p><p>✅ <b>미션:</b> 스피드를 유지하면서 콘을 사뿐하게 뛰어넘어 반환점을 돌아옵니다.</p><p>✅ <b>감점:</b> 도약하다 콘을 밟거나 쓰러뜨리면 최종 기록에 +2초 추가!</p><p>✅ <b>팁:</b> 두 발을 모아 폴짝 뛰지 말고 한 발씩 리듬을 타며 건너가세요!</p></div>" },
             longjump: { animIcon: "🦘", bgIcon: "📏", title: "멀리뛰기 (제자리 릴레이)", guideText: "팔을 힘껏 뻗었다가 도약하세요!", missionTitle: "제자리 릴레이 멀리뛰기", bgColor: "from-blue-600 to-indigo-800", roles: [{ name: "점퍼 🦘", color: "cyan" }, { name: "측정관 📏", color: "yellow" }, { name: "기록 📋", color: "slate" }], scoreLabel: "기록 연장!",
                 youtubeLinks: [ { text: "🥇 세계육상선수권 남자 멀리뛰기 결승", url: ytBase+"vbIvqxDuAZg" }, { text: "🦘 파리올림픽 여자 멀리뛰기 세리머니", url: ytBase+"-7A64EJgRAg" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>진행:</b> 1번 주자가 출발선에서 팔 반동을 주어 제자리 멀리뛰기를 합니다.</p><p>✅ <b>릴레이:</b> 1번 주자가 착지한 '발뒤꿈치' 위치가 2번 주자의 출발선이 됩니다.</p><p>✅ <b>승리:</b> 연달아 뛰어 총 거리를 가장 멀리까지 전진한 팀이 최종 승리!</p><p>🚨 착지 후 중심을 잃고 손을 짚으면 손이 닿은 뒤쪽 위치로 기록이 후퇴합니다.</p></div>" },
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>진행:</b> 1번 주자가 반동을 주어 제자리 멀리뛰기를 합니다.</p><p>✅ <b>릴레이:</b> 1번 주자가 착지한 '발뒤꿈치' 위치가 2번 주자의 출발선이 됩니다.</p><p>✅ <b>승리:</b> 연달아 뛰어 총 거리를 가장 멀리까지 전진한 팀이 승리!</p><p>🚨 착지 후 중심을 잃고 손을 짚으면 손이 닿은 위치로 기록이 후퇴합니다.</p></div>" },
 
-            // 5. 레이스/릴레이형
             relay: { animIcon: "🥄", bgIcon: "🔥", title: "육상 계주 (성화 봉송)", guideText: "숟가락의 수평을 단단히 유지하세요!", missionTitle: "숟가락 탁구공 성화 릴레이", bgColor: "from-orange-600 to-red-800", roles: [{ name: "1,3주자 🏃", color: "cyan" }, { name: "2,4주자 🏃‍♀️", color: "purple" }, { name: "성화관리 🔥", color: "red" }], scoreLabel: "터치 완료!",
                 youtubeLinks: [ { text: "🥇 사상 첫 400m 남자 계주 금메달 순간", url: ytBase+"FrTU_XysMjc" }, { text: "🏃 세계대회 육상 계주 결승전 하이라이트", url: ytBase+"vbIvqxDuAZg" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 밥숟가락 1개, 탁구공 1개, 반환점 콘</p><p>✅ <b>미션:</b> 숟가락에 탁구공(성화)을 올리고 떨어뜨리지 않은 채 반환점을 돕니다.</p><p>✅ <b>규칙:</b> 걷다가 공이 떨어지면 제자리에 멈춰서 공을 줍고 다시 출발해야 합니다.</p><p>✅ <b>전략:</b> 무조건 뛰는 것보다 수평을 꽉 잡고 빠른 걸음으로 걷는 것이 유리합니다!</p></div>" },
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>준비물:</b> 밥숟가락 1개, 탁구공 1개, 반환점 콘</p><p>✅ <b>미션:</b> 숟가락에 탁구공(성화)을 올리고 떨어뜨리지 않은 채 반환점을 돕니다.</p><p>✅ <b>규칙:</b> 걷다가 공이 떨어지면 제자리에 멈춰서 공을 줍고 다시 출발해야 합니다.</p><p>✅ <b>전략:</b> 무조건 뛰는 것보다 수평을 잡고 빠른 걸음으로 걷는 것이 유리합니다!</p></div>" },
             swimming: { animIcon: "🏊", bgIcon: "🌊", title: "수영 (스쿠터보드 릴레이)", guideText: "양팔을 수영하듯 바닥을 저으세요!", missionTitle: "실내 스쿠터보드 수영장", bgColor: "from-cyan-500 to-blue-800", roles: [{ name: "자유형 🏊", color: "blue" }, { name: "평영 🐸", color: "green" }, { name: "터치패드 ⏱️", color: "yellow" }], scoreLabel: "터치 패드!",
                 youtubeLinks: [ { text: "🏊 자유형할 때 머리 위치 완벽 가이드", url: ytBase+"e-3ljW2smbE" }, { text: "🌊 수영 기초: 앞으로 안 나갈 때 해결법", url: ytBase+"e-3ljW2smbE" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>자세:</b> 바퀴 달린 네모난 스쿠터보드 중앙에 배를 대고 엎드립니다.</p><p>✅ <b>주행:</b> 자유형 하듯 양팔과 다리를 사용해 바닥을 세게 긁으며 전진!</p><p>✅ <b>터치:</b> 반환점을 돌아 벽(터치패드)을 손으로 쾅 치면 다음 주자가 출발합니다.</p><p>🚨 일어서서 타거나 무릎으로 찍어 누르며 타면 다칠 위험이 커서 절대 금지입니다.</p></div>" },
@@ -253,13 +253,12 @@
                 youtubeLinks: [ { text: "🛶 강한 체력과 집중력! 조정 경기 다큐", url: ytBase+"mfEf643I-kc" }, { text: "🚣 쾌속 질주! 명문 조정 경기 하이라이트", url: ytBase+"6b6qWhiHSF8" } ],
                 missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 두 팀이 매트 위에 마주 보고 일렬로 앉아 긴 밧줄을 꽉 잡습니다.</p><p>✅ <b>규칙:</b> 엉덩이를 떼거나 일어서면 즉시 실격! 오직 상체와 코어 힘으로만 당깁니다.</p><p>✅ <b>승리:</b> 밧줄 중앙에 묶인 리본이 우리 팀 진영 선을 완전히 넘어오면 승리!</p><p>🏆 맨 앞의 콕스가 '영~차!' 구령을 넣고 동시에 당기는 것이 우승 비법입니다.</p></div>" },
 
-            // 6. 표현형
             gymnastics: { animIcon: "🎀", bgIcon: "🎗️", title: "체조 (휴지 리본 댄스)", guideText: "리본이 꼬이지 않게 크게 원을 그리세요!", missionTitle: "휴지 리본 예술 체조", bgColor: "from-purple-600 to-pink-800", roles: [{ name: "체조선수 🎀", color: "pink" }, { name: "안무가 🎶", color: "purple" }, { name: "심사 💯", color: "yellow" }], scoreLabel: "예술점수 +1",
                 youtubeLinks: [ { text: "🎗️ 눈으로 배우는 체육 리듬체조 리본 만들기", url: ytBase+"dpJ8Qf2Ff64" }, { text: "🎀 아이돌스타 선수권 대회 리본 연기", url: ytBase+"VaeP3F3ND1c" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 나무젓가락 끝에 두루마리 휴지를 1m 붙여 리본을 뚝딱 만듭니다.</p><p>✅ <b>미션:</b> 선생님이 틀어주는 음악에 맞춰 모둠별 창작 안무를 선보입니다.</p><p>✅ <b>필수:</b> 8자 그리기, 나선형(소용돌이) 동작이 각 1번 이상 꼭 들어가야 합니다.</p><p>🚨 춤을 추다 휴지가 바닥에 끌려 끊어지면 예술 점수가 팍팍 감점됩니다!</p></div>" },
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>세팅:</b> 나무젓가락 끝에 두루마리 휴지를 1m 붙여 리본을 만듭니다.</p><p>✅ <b>미션:</b> 음악에 맞춰 모둠별 창작 안무를 선보입니다.</p><p>✅ <b>필수:</b> 8자 그리기, 나선형(소용돌이) 동작이 꼭 포함되어야 합니다.</p><p>🚨 춤을 추다 휴지가 바닥에 닿아 끊어지면 예술 점수가 감점됩니다!</p></div>" },
             breaking: { animIcon: "🕺", bgIcon: "🎧", title: "브레이킹 (포즈 프리즈)", guideText: "음악이 멈추면 흔들림 없이 정지하세요!", missionTitle: "스포츠 포즈 프리즈(Freeze)", bgColor: "from-yellow-500 to-orange-600", roles: [{ name: "비보이 🕺", color: "blue" }, { name: "DJ 🎧", color: "purple" }, { name: "심사관 👀", color: "slate" }], scoreLabel: "생존자 +1",
                 youtubeLinks: [ { text: "🕺 360도 카메라로 보는 브레이킹 댄스", url: ytBase+"E6JPRfQtr-E" }, { text: "🎧 브레이킹 중 가장 강력한 발차기 기술", url: ytBase+"DpSXMH98L_g" } ],
-                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>진행:</b> K팝 댄스 음악이 울리면 교실 중앙에서 신나게 막춤을 춥니다.</p><p>✅ <b>돌발 미션:</b> 선생님(DJ)이 음악을 멈추고 '양궁!' 등 종목을 기습적으로 외칩니다.</p><p>✅ <b>규칙:</b> 외친 종목에 맞는 역동적인 포즈를 즉시 취하고 딱 3초간 얼음(Freeze)!</p><p>🏆 다리가 심하게 흔들리거나 웃음이 터지면 탈락. 최후의 생존자가 승리합니다.</p></div>" }
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base font-medium leading-relaxed text-left px-2'><p>✅ <b>진행:</b> K팝 댄스 음악이 울리면 교실 중앙에서 신나게 막춤을 춥니다.</p><p>✅ <b>돌발 미션:</b> 선생님(DJ)이 음악을 멈추고 '양궁!' 등 종목을 기습적으로 외칩니다.</p><p>✅ <b>규칙:</b> 외친 종목에 맞는 역동적인 포즈를 즉시 취하고 딱 3초간 얼음(Freeze)!</p><p>🏆 다리가 흔들리거나 웃음이 터지면 탈락. 최후의 생존자가 승리합니다.</p></div>" }
         };
 
         let currentEvent = 'archery';
@@ -276,7 +275,10 @@
 
         function goHome() {
             const card = document.getElementById('mission-card');
-            if(card.classList.contains('flip')) card.classList.remove('flip');
+            if(card.classList.contains('flip')) {
+                card.classList.remove('flip');
+                document.getElementById('btn-flip').innerHTML = "오늘의 미션 상세 보기! 🚀";
+            }
             switchTab('mission');
         }
 
@@ -284,21 +286,19 @@
             currentEvent = document.getElementById('event-selector').value;
             const data = sportEvents[currentEvent];
 
-            // 앞면 렌더링
             document.getElementById('anim-icon').innerText = data.animIcon;
             document.getElementById('anim-title').innerText = data.title;
             document.getElementById('anim-guide').innerText = data.guideText;
             
-            // 📺 에러 완벽 해결! 기본 <a> 태그를 이용해 유튜브 앱/웹으로 직접 연결
+            // 📺 유튜브 새창 열기 방식
             const linksContainer = document.getElementById('youtube-links-container');
             linksContainer.innerHTML = data.youtubeLinks.map(link => 
-                `<a href="${link.url}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 sm:gap-3 bg-slate-700 hover:bg-red-600 text-white font-bold py-2 md:py-3 px-3 md:px-4 rounded-xl transition-colors border border-slate-500 hover:border-red-400 shadow-md w-full text-left">
+                `<button onclick="window.open('${link.url}', '_blank'); return false;" class="flex items-center gap-2 sm:gap-3 bg-slate-700 hover:bg-red-600 text-white font-bold py-2 md:py-3 px-3 md:px-4 rounded-xl transition-colors border border-slate-500 hover:border-red-400 shadow-md w-full text-left cursor-pointer shrink-0">
                     <span class="text-lg md:text-2xl shrink-0">▶️</span>
-                    <span class="truncate text-xs sm:text-sm md:text-lg w-full break-keep">${link.text}</span>
-                </a>`
+                    <span class="truncate text-xs sm:text-sm md:text-lg w-full">${link.text}</span>
+                </button>`
             ).join('');
             
-            // 뒷면 렌더링
             document.getElementById('back-icon').innerText = data.bgIcon;
             document.getElementById('bg-icon-A').innerText = data.bgIcon;
             document.getElementById('bg-icon-B').innerText = data.bgIcon;
@@ -307,9 +307,10 @@
             document.getElementById('mission-desc').innerHTML = data.missionDesc; 
             document.getElementById('mission-back').className = `back flex flex-col items-center justify-start text-center p-4 md:p-8 border-4 border-white bg-gradient-to-br ${data.bgColor} overflow-y-auto custom-scrollbar`;
             
+            // 종목 변경 시 앞면으로 복구 및 버튼 텍스트 초기화
             document.getElementById('mission-card').classList.remove('flip');
+            document.getElementById('btn-flip').innerHTML = "오늘의 미션 상세 보기! 🚀";
 
-            // 스코어보드 렌더링
             const selectEl = document.getElementById('event-selector');
             const eventNameText = selectEl.options[selectEl.selectedIndex].text;
             const eventName = eventNameText.includes('(') ? eventNameText.split(' (')[0] : eventNameText; 
@@ -317,7 +318,6 @@
             document.getElementById('btn-score-A').innerText = data.scoreLabel;
             document.getElementById('btn-score-B').innerText = data.scoreLabel;
             
-            // 룰렛 초기화
             document.getElementById('roulette-result').innerHTML = '';
             document.getElementById('roulette-result').classList.add('hidden-tab');
             document.getElementById('roulette-display').style.display = 'none';
@@ -338,7 +338,17 @@
             document.getElementById('btn-' + tabId).classList.replace('bg-slate-700', 'bg-blue-600');
         }
 
-        function flipCard() { document.getElementById('mission-card').classList.toggle('flip'); }
+        // 💡 카드 뒤집기 및 텍스트 토글 기능
+        function flipCard() { 
+            const card = document.getElementById('mission-card');
+            card.classList.toggle('flip'); 
+            const btn = document.getElementById('btn-flip');
+            if(card.classList.contains('flip')) {
+                btn.innerHTML = "관련 영상 다시 보기 📺";
+            } else {
+                btn.innerHTML = "오늘의 미션 상세 보기! 🚀";
+            }
+        }
 
         function addScore(team) {
             scores[team]++; localStorage.setItem('scores_' + currentEvent, JSON.stringify(scores)); updateScoreUI();
