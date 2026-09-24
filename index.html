@@ -14,7 +14,8 @@
         .font-black-han { font-family: 'Black Han Sans', sans-serif; }
         .hidden-tab { display: none !important; }
 
-        .flip-container { perspective: 1000px; width: 100%; max-width: 800px; height: 450px; margin: 0 auto; }
+        /* 카드 높이를 450px -> 500px로 증가시켜 글씨 잘림 방지 */
+        .flip-container { perspective: 1000px; width: 100%; max-width: 800px; height: 500px; margin: 0 auto; }
         .flipper { transition: 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flip-container.flip .flipper { transform: rotateY(180deg); }
         .front, .back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1.5rem; }
@@ -26,21 +27,18 @@
         @keyframes pulseRed { 0%, 100% { color: #f87171; text-shadow: 0 0 10px #f87171; } 50% { color: #ffffff; text-shadow: none; } }
         .timer-warning { animation: pulseRed 1s infinite; }
         
-        /* 다이내믹 튜토리얼 애니메이션 (유튜브 완전 대체) */
         @keyframes floatAction { 
             0% { transform: translateY(0px) scale(1); } 
-            50% { transform: translateY(-20px) scale(1.1); } 
+            50% { transform: translateY(-15px) scale(1.05); } 
             100% { transform: translateY(0px) scale(1); } 
         }
-        .action-anim { animation: floatAction 2s ease-in-out infinite; }
+        .action-anim { animation: floatAction 2.5s ease-in-out infinite; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <!-- 상단 네비게이션 -->
     <nav class="bg-slate-800 p-4 shadow-lg z-10 flex flex-wrap justify-between items-center px-4 md:px-8 gap-4">
         <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-center">
-            <!-- 🏠 홈 버튼 추가 -->
             <button onclick="goHome()" class="text-2xl hover:scale-110 transition-transform bg-slate-700 p-2 rounded-lg border border-slate-600 shadow-md" title="처음으로">🏠</button>
             <span class="text-lg md:text-xl font-black-han text-yellow-400 whitespace-nowrap hidden md:inline">🔥 오늘의 종목:</span>
             
@@ -72,39 +70,38 @@
         </div>
     </nav>
 
-    <!-- 1. 미션 룸 (오프라인 애니메이션 튜토리얼 100% 적용) -->
+    <!-- 1. 미션 룸 -->
     <section id="tab-mission" class="flex-1 p-4 md:p-6 flex flex-col items-center justify-center relative">
         <h1 class="text-3xl md:text-4xl font-black-han text-yellow-400 mb-6 tracking-wider text-center">오늘의 스포츠 미션 알아보기!</h1>
         
         <div class="flip-container" id="mission-card">
             <div class="flipper shadow-2xl">
-                <!-- 앞면: 유튜브 완전 삭제 -> 역동적인 CSS 애니메이션 뷰어 -->
+                <!-- 앞면 (레이아웃 수정) -->
                 <div class="front bg-slate-800 flex flex-col border-4 border-slate-600 overflow-hidden relative">
-                    <div class="bg-slate-900 p-3 flex justify-between items-center border-b border-slate-700">
+                    <div class="bg-slate-900 p-3 flex justify-between items-center border-b border-slate-700 shrink-0">
                         <span class="text-2xl ml-2">💡</span>
                         <span class="text-slate-300 font-bold text-sm md:text-base">리드업 게임 규칙 안내</span>
                         <span class="text-2xl mr-2">💡</span>
                     </div>
                     
-                    <div class="flex-1 flex flex-col items-center justify-center relative p-8">
-                        <!-- 움직이는 메인 아이콘 -->
-                        <div id="anim-icon" class="text-[8rem] md:text-[10rem] action-anim drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-6">🎯</div>
-                        <!-- 종목 제목 및 튜토리얼 텍스트 -->
-                        <h2 id="anim-title" class="text-3xl md:text-5xl font-black-han text-white tracking-widest drop-shadow-lg mb-4 text-center break-keep">양궁 (훌라후프 과녁)</h2>
-                        <p id="anim-guide" class="text-slate-300 font-bold text-lg md:text-2xl text-center bg-black/40 px-6 py-3 rounded-full border border-slate-600">준비선에 서서 과녁을 조준하세요!</p>
+                    <!-- padding을 조절하고 내용을 중앙에 안전하게 배치 -->
+                    <div class="flex-1 flex flex-col items-center justify-center relative p-6 w-full">
+                        <div id="anim-icon" class="text-[7rem] md:text-[9rem] action-anim drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-4 shrink-0">🎯</div>
+                        <h2 id="anim-title" class="text-3xl md:text-5xl font-black-han text-white tracking-widest drop-shadow-lg mb-6 text-center break-keep w-full shrink-0">양궁 (훌라후프 과녁)</h2>
+                        <p id="anim-guide" class="text-slate-300 font-bold text-lg md:text-2xl text-center bg-black/40 px-6 py-4 rounded-full border border-slate-600 w-11/12 max-w-lg break-keep shrink-0 shadow-inner">준비선에 서서 과녁을 조준하세요!</p>
                     </div>
                 </div>
 
-                <!-- 뒷면: 미션 (기존 동일) -->
+                <!-- 뒷면 -->
                 <div id="mission-back" class="back flex flex-col items-center justify-center text-center p-6 md:p-8 border-4 border-white bg-gradient-to-br from-blue-500 to-cyan-600">
-                    <span id="back-icon" class="text-8xl md:text-[10rem] mb-4 drop-shadow-2xl">🏹</span>
-                    <h2 class="text-2xl md:text-3xl font-bold mb-2">🔥 오늘의 체육 미션 🔥</h2>
-                    <h3 id="mission-title" class="text-5xl md:text-6xl font-black-han text-yellow-300 drop-shadow-md tracking-widest mt-2 mb-6 break-keep">훌라후프 양궁</h3>
-                    <p id="mission-desc" class="text-xl md:text-3xl font-bold bg-black/50 p-5 rounded-2xl leading-relaxed text-white break-keep">콩주머니를 던져 과녁 중앙을 맞춰라! 역전 찬스를 노리자!</p>
+                    <span id="back-icon" class="text-8xl md:text-[10rem] mb-4 drop-shadow-2xl shrink-0">🏹</span>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 shrink-0">🔥 오늘의 체육 미션 🔥</h2>
+                    <h3 id="mission-title" class="text-5xl md:text-6xl font-black-han text-yellow-300 drop-shadow-md tracking-widest mt-2 mb-6 break-keep shrink-0">훌라후프 양궁</h3>
+                    <p id="mission-desc" class="text-xl md:text-3xl font-bold bg-black/50 p-5 rounded-2xl leading-relaxed text-white break-keep w-11/12 max-w-xl shrink-0">콩주머니를 던져 과녁 중앙을 맞춰라! 역전 찬스를 노리자!</p>
                 </div>
             </div>
         </div>
-        <button onclick="flipCard()" class="mt-8 px-10 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-2xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all">오늘의 변형 게임 미션 공개! 🚀</button>
+        <button onclick="flipCard()" class="mt-8 px-10 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-2xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all shrink-0">오늘의 변형 게임 미션 공개! 🚀</button>
     </section>
 
     <!-- 2. 역할 뽑기 룰렛 -->
@@ -156,7 +153,6 @@
             slate: { bg: 'bg-slate-800/80', border: 'border-slate-500', text: 'text-slate-300' }, pink: { bg: 'bg-pink-900/50', border: 'border-pink-500', text: 'text-pink-400' }
         };
 
-        // 데이터베이스 (유튜브 영상 ID 제거 -> 자체 튜토리얼 텍스트 추가)
         const sportEvents = {
             archery: { animIcon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", guideText: "준비선에 서서 과녁을 조준하세요!", missionTitle: "훌라후프 양궁", missionDesc: "콩주머니를 던져 과녁 중앙을 맞춰라!", bgColor: "from-yellow-500 to-red-600", roles: [{ name: "슈터 🏹", color: "red" }, { name: "점수 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1" },
             golf: { animIcon: "⛳", bgIcon: "⛳", title: "골프 (교실 빗자루)", guideText: "빗자루를 부드럽게 스윙하세요!", missionTitle: "빗자루 교실 골프", missionDesc: "교실 장애물(벙커)을 피해 빗자루로 공을 쳐라!", bgColor: "from-emerald-600 to-teal-800", roles: [{ name: "골퍼 🏌️", color: "green" }, { name: "캐디 ⛳", color: "blue" }, { name: "갤러리 👏", color: "slate" }], scoreLabel: "나이스 샷!" },
@@ -182,14 +178,11 @@
 
         function saveStudentNames() { localStorage.setItem('student_names', document.getElementById('student-names').value); }
 
-        // 홈 버튼 로직
         function goHome() {
-            // 카드가 뒤집혀 있다면 원상복구
             const card = document.getElementById('mission-card');
             if(card.classList.contains('flip')) {
                 card.classList.remove('flip');
             }
-            // 미션 룸 탭으로 이동
             switchTab('mission');
         }
 
@@ -197,30 +190,26 @@
             currentEvent = document.getElementById('event-selector').value;
             const data = sportEvents[currentEvent];
 
-            // 애니메이션 튜토리얼 룸 (앞면) 업데이트
             document.getElementById('anim-icon').innerText = data.animIcon;
             document.getElementById('anim-title').innerText = data.title;
             document.getElementById('anim-guide').innerText = data.guideText;
             
-            // 미션 카드 (뒷면) 업데이트
             document.getElementById('back-icon').innerText = data.bgIcon;
+            document.getElementById('bg-icon-A').innerText = data.bgIcon;
+            document.getElementById('bg-icon-B').innerText = data.bgIcon;
+            
             document.getElementById('mission-title').innerText = data.missionTitle;
             document.getElementById('mission-desc').innerText = data.missionDesc;
             document.getElementById('mission-back').className = `back flex flex-col items-center justify-center text-center p-6 md:p-8 border-4 border-white bg-gradient-to-br ${data.bgColor}`;
             
-            // 카드 항상 앞면으로 리셋
             document.getElementById('mission-card').classList.remove('flip');
 
-            // 스코어보드 텍스트 업데이트
             const selectEl = document.getElementById('event-selector');
             const eventName = selectEl.options[selectEl.selectedIndex].text.split('. ')[1];
             document.getElementById('scoreboard-title').innerText = `🔥 ${eventName} 진행 중!`;
-            document.getElementById('bg-icon-A').innerText = data.bgIcon;
-            document.getElementById('bg-icon-B').innerText = data.bgIcon;
             document.getElementById('btn-score-A').innerText = data.scoreLabel;
             document.getElementById('btn-score-B').innerText = data.scoreLabel;
             
-            // 룰렛 초기화 및 화면 정리 (버그 수정)
             document.getElementById('roulette-result').innerHTML = '';
             document.getElementById('roulette-result').classList.add('hidden-tab');
             document.getElementById('roulette-display').style.display = 'none';
@@ -229,7 +218,6 @@
             btnStartRoulette.classList.remove('opacity-50');
             btnStartRoulette.innerText = "역할 섞기 시작! 🌪️";
 
-            // 스코어보드 점수 로드
             const savedScores = localStorage.getItem('scores_' + currentEvent);
             scores = savedScores ? JSON.parse(savedScores) : { A: 0, B: 0 };
             updateScoreUI();
