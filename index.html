@@ -14,13 +14,13 @@
         .font-black-han { font-family: 'Black Han Sans', sans-serif; }
         .hidden-tab { display: none !important; }
 
-        /* 카드 높이를 600px로 넉넉하게 늘려 긴 설명이 예쁘게 들어가도록 조정 */
-        .flip-container { perspective: 1000px; width: 100%; max-width: 800px; height: 600px; margin: 0 auto; }
+        /* 모바일 환경 대응: 카드 높이를 유동적으로 조정하고 내부 스크롤 허용 */
+        .flip-container { perspective: 1000px; width: 100%; max-width: 800px; height: 65vh; min-height: 500px; max-height: 650px; margin: 0 auto; }
         .flipper { transition: 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
         .flip-container.flip .flipper { transform: rotateY(180deg); }
-        .front, .back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1.5rem; }
+        .front, .back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1.5rem; overflow-y: auto; overflow-x: hidden; }
         .front { z-index: 2; transform: rotateY(0deg); }
-        .back { transform: rotateY(180deg); overflow-y: auto; } /* 뒷면 내용이 많을 경우 스크롤 허용 */
+        .back { transform: rotateY(180deg); }
 
         @keyframes bounceIn { 0% { transform: scale(0.1); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
         .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -29,27 +29,27 @@
         
         @keyframes floatAction { 
             0% { transform: translateY(0px) scale(1); } 
-            50% { transform: translateY(-10px) scale(1.05); } 
+            50% { transform: translateY(-8px) scale(1.03); } 
             100% { transform: translateY(0px) scale(1); } 
         }
         .action-anim { animation: floatAction 2.5s ease-in-out infinite; }
         
-        /* 스크롤바 커스텀 */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); }
+        /* 세련된 스크롤바 (모바일/PC 공통) */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.4); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.6); }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <!-- 상단 네비게이션 -->
-    <nav class="bg-slate-800 p-4 shadow-lg z-10 flex flex-wrap justify-between items-center px-4 md:px-8 gap-4 shrink-0">
-        <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-center">
-            <button onclick="goHome()" class="text-xl md:text-2xl hover:scale-110 transition-transform bg-slate-700 p-2 rounded-lg border border-slate-600 shadow-md" title="처음으로">🏠</button>
-            <span class="text-lg md:text-xl font-black-han text-yellow-400 whitespace-nowrap hidden md:inline">🔥 오늘의 종목:</span>
+    <!-- 상단 네비게이션 (모바일 글자 잘림 완벽 방지 레이아웃) -->
+    <nav class="bg-slate-800 p-3 md:p-4 shadow-lg z-10 flex flex-col md:flex-row justify-between items-center gap-3 shrink-0 w-full">
+        <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-start">
+            <button onclick="goHome()" class="text-lg md:text-2xl hover:scale-105 transition-transform bg-slate-700 p-2 rounded-lg border border-slate-600 shadow-md shrink-0" title="처음으로">🏠</button>
+            <span class="text-sm md:text-xl font-black-han text-yellow-400 whitespace-nowrap hidden sm:inline shrink-0">🔥 오늘의 종목:</span>
             
-            <select id="event-selector" onchange="changeSportEvent()" class="bg-slate-700 text-white text-sm md:text-lg font-bold p-2 rounded-lg border-2 border-slate-500 focus:border-yellow-400 outline-none w-full md:w-auto">
+            <select id="event-selector" onchange="changeSportEvent()" class="bg-slate-700 text-white text-xs sm:text-sm md:text-lg font-bold p-2 rounded-lg border-2 border-slate-500 focus:border-yellow-400 outline-none w-full max-w-[220px] sm:max-w-xs md:max-w-md truncate">
                 <optgroup label="1. 표적/타겟형">
                     <option value="archery" selected>양궁 (훌라후프 과녁 던지기)</option>
                     <option value="golf">골프 (빗자루 교실 골프)</option>
@@ -84,93 +84,94 @@
                 </optgroup>
             </select>
         </div>
-        <div class="flex gap-2 md:gap-4 w-full md:w-auto justify-center">
-            <button onclick="switchTab('mission')" id="btn-mission" class="tab-btn px-3 md:px-6 py-2 rounded-lg font-bold text-sm md:text-xl bg-blue-600 hover:bg-blue-500 transition shadow">🎬 미션 룸</button>
-            <button onclick="switchTab('roulette')" id="btn-roulette" class="tab-btn px-3 md:px-6 py-2 rounded-lg font-bold text-sm md:text-xl bg-slate-700 hover:bg-slate-600 transition shadow">🎲 역할 뽑기</button>
-            <button onclick="switchTab('scoreboard')" id="btn-scoreboard" class="tab-btn px-3 md:px-6 py-2 rounded-lg font-bold text-sm md:text-xl bg-slate-700 hover:bg-slate-600 transition shadow">🎯 스코어보드</button>
+        <div class="flex gap-1 sm:gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-end">
+            <button onclick="switchTab('mission')" id="btn-mission" class="tab-btn flex-1 md:flex-none px-2 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm md:text-xl bg-blue-600 hover:bg-blue-500 transition shadow whitespace-nowrap">🎬 미션</button>
+            <button onclick="switchTab('roulette')" id="btn-roulette" class="tab-btn flex-1 md:flex-none px-2 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm md:text-xl bg-slate-700 hover:bg-slate-600 transition shadow whitespace-nowrap">🎲 역할</button>
+            <button onclick="switchTab('scoreboard')" id="btn-scoreboard" class="tab-btn flex-1 md:flex-none px-2 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm md:text-xl bg-slate-700 hover:bg-slate-600 transition shadow whitespace-nowrap">🎯 점수</button>
         </div>
     </nav>
 
     <!-- 1. 미션 룸 -->
-    <section id="tab-mission" class="flex-1 p-4 md:p-6 flex flex-col items-center justify-center relative overflow-y-auto">
-        <h1 class="text-3xl md:text-4xl font-black-han text-yellow-400 mb-4 tracking-wider text-center shrink-0">오늘의 스포츠 미션 알아보기!</h1>
+    <section id="tab-mission" class="flex-1 p-3 md:p-6 flex flex-col items-center justify-center relative overflow-y-auto">
+        <h1 class="text-2xl md:text-4xl font-black-han text-yellow-400 mb-3 md:mb-5 tracking-wider text-center shrink-0">오늘의 스포츠 미션 알아보기!</h1>
         
-        <div class="flip-container shrink-0" id="mission-card">
+        <div class="flip-container shrink-0 w-full" id="mission-card">
             <div class="flipper shadow-2xl">
-                <!-- 앞면: 일러스트 + 유튜브 추천 직접 연결 링크 2개 -->
+                <!-- 앞면: 일러스트 + 유튜브 최신 링크 2개 -->
                 <div class="front bg-slate-800 flex flex-col border-4 border-slate-600 overflow-hidden relative justify-between">
-                    <div class="bg-slate-900 p-3 flex justify-between items-center border-b border-slate-700 shrink-0">
-                        <span class="text-2xl ml-2">💡</span>
-                        <span class="text-slate-300 font-bold text-sm md:text-base">리드업 게임 규칙 안내</span>
-                        <span class="text-2xl mr-2">💡</span>
+                    <div class="bg-slate-900 p-2 md:p-3 flex justify-between items-center border-b border-slate-700 shrink-0">
+                        <span class="text-xl md:text-2xl ml-2">💡</span>
+                        <span class="text-slate-300 font-bold text-xs md:text-base">리드업 게임 규칙 안내</span>
+                        <span class="text-xl md:text-2xl mr-2">💡</span>
                     </div>
                     
-                    <div class="flex-1 flex flex-col items-center justify-center relative p-4 w-full shrink-0">
-                        <div id="anim-icon" class="text-[6rem] md:text-[8rem] action-anim drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-2 shrink-0">🎯</div>
-                        <h2 id="anim-title" class="text-3xl md:text-5xl font-black-han text-white tracking-widest drop-shadow-lg mb-4 text-center break-keep w-full shrink-0">양궁 (훌라후프)</h2>
-                        <p id="anim-guide" class="text-slate-300 font-bold text-base md:text-xl text-center bg-black/40 px-6 py-3 rounded-full border border-slate-600 w-11/12 max-w-lg break-keep shrink-0 shadow-inner">준비선에 서서 과녁을 조준하세요!</p>
+                    <div class="flex-1 flex flex-col items-center justify-center relative p-3 md:p-4 w-full shrink-0">
+                        <div id="anim-icon" class="text-[5rem] md:text-[8rem] action-anim drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-2 shrink-0">🎯</div>
+                        <h2 id="anim-title" class="text-2xl sm:text-3xl md:text-5xl font-black-han text-white tracking-widest drop-shadow-lg mb-3 text-center break-keep w-full shrink-0">양궁 (훌라후프)</h2>
+                        <p id="anim-guide" class="text-slate-300 font-bold text-sm md:text-xl text-center bg-black/40 px-4 md:px-6 py-2 md:py-3 rounded-full border border-slate-600 w-11/12 max-w-lg break-keep shrink-0 shadow-inner">준비선에 서서 과녁을 조준하세요!</p>
                     </div>
 
-                    <!-- 📺 에러없는 유튜브 직접 재생 링크 2개 영역 -->
-                    <div class="w-full bg-slate-900 p-5 border-t border-slate-700 flex flex-col gap-3 shrink-0">
-                        <h4 class="text-yellow-400 font-bold text-base mb-1 text-center">📺 관련 영상 2가지 (클릭 시 새 창에서 즉시 재생)</h4>
-                        <div id="youtube-links-container" class="flex flex-col gap-3">
-                            <!-- JS로 버튼 2개가 동적 생성됨 -->
+                    <!-- 📺 유튜브 직접 재생 링크 영역 -->
+                    <div class="w-full bg-slate-900 p-3 md:p-5 border-t border-slate-700 flex flex-col gap-2 shrink-0">
+                        <h4 class="text-yellow-400 font-bold text-xs md:text-base mb-1 text-center">📺 관련 영상 (클릭 시 즉시 재생)</h4>
+                        <div id="youtube-links-container" class="flex flex-col gap-2">
+                            <!-- JS 동적 생성 -->
                         </div>
                     </div>
                 </div>
 
-                <!-- 뒷면: 구체적이고 상세한 변형 게임 설명 -->
-                <div id="mission-back" class="back flex flex-col items-center justify-start text-center p-6 md:p-8 border-4 border-white bg-gradient-to-br from-blue-600 to-cyan-700 overflow-y-auto">
-                    <span id="back-icon" class="text-[4rem] md:text-[5rem] mb-2 drop-shadow-2xl shrink-0">🏹</span>
-                    <h3 id="mission-title" class="text-3xl md:text-5xl font-black-han text-yellow-300 drop-shadow-md tracking-widest mb-6 break-keep shrink-0 border-b-2 border-white/30 pb-4 w-full">훌라후프 양궁</h3>
+                <!-- 뒷면: 극강의 디테일! 선생님을 위한 변형 게임 설명 -->
+                <div id="mission-back" class="back flex flex-col items-center justify-start text-center p-4 md:p-8 border-4 border-white bg-gradient-to-br from-blue-600 to-cyan-700">
+                    <span id="back-icon" class="text-[3rem] md:text-[5rem] mb-1 md:mb-2 drop-shadow-2xl shrink-0">🏹</span>
+                    <h3 id="mission-title" class="text-3xl md:text-5xl font-black-han text-yellow-300 drop-shadow-md tracking-widest mb-3 md:mb-5 break-keep shrink-0 border-b-2 border-white/30 pb-2 md:pb-4 w-full">훌라후프 양궁</h3>
                     
-                    <div id="mission-desc" class="w-full max-w-2xl bg-black/40 rounded-2xl p-6 text-white text-left break-keep shadow-inner mb-4">
+                    <div id="mission-desc" class="w-full max-w-2xl bg-black/40 rounded-2xl p-4 md:p-6 text-white text-left break-keep shadow-inner mb-2 md:mb-4">
                         <!-- 세부 규칙 삽입 영역 -->
                     </div>
                 </div>
             </div>
         </div>
-        <button onclick="flipCard()" class="mt-8 px-10 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-2xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all shrink-0">오늘의 변형 게임 미션 공개! 🚀</button>
+        <button onclick="flipCard()" class="mt-4 md:mt-8 px-8 md:px-10 py-3 md:py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all shrink-0">오늘의 미션 상세 보기! 🚀</button>
     </section>
 
     <!-- 2. 역할 뽑기 룰렛 -->
     <section id="tab-roulette" class="flex-1 hidden-tab p-4 md:p-8 flex flex-col items-center overflow-y-auto">
-        <h1 class="text-3xl md:text-4xl font-black-han text-green-400 mb-4 tracking-wider text-center">🎲 종목 맞춤형 역할 뽑기</h1>
+        <h1 class="text-2xl md:text-4xl font-black-han text-green-400 mb-4 tracking-wider text-center">🎲 종목 맞춤형 역할 뽑기</h1>
         <div class="w-full max-w-4xl bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl flex flex-col items-center shrink-0">
-            <textarea id="student-names" oninput="saveStudentNames()" rows="3" class="w-full p-4 rounded-lg bg-slate-700 text-white border-2 border-slate-600 focus:border-green-400 outline-none text-lg md:text-xl mb-6" placeholder="우리 반 학생들 이름을 쉼표로 구분하여 입력하세요..."></textarea>
-            <button onclick="startRoulette()" id="btn-start-roulette" class="w-full py-4 bg-green-500 hover:bg-green-400 text-black font-black-han text-2xl md:text-3xl rounded-xl shadow-lg transition transform hover:scale-105">역할 섞기 시작! 🌪️</button>
+            <textarea id="student-names" oninput="saveStudentNames()" rows="3" class="w-full p-3 md:p-4 rounded-lg bg-slate-700 text-white border-2 border-slate-600 focus:border-green-400 outline-none text-sm md:text-xl mb-4 md:mb-6" placeholder="우리 반 학생들 이름을 쉼표로 구분하여 입력하세요..."></textarea>
+            <button onclick="startRoulette()" id="btn-start-roulette" class="w-full py-3 md:py-4 bg-green-500 hover:bg-green-400 text-black font-black-han text-xl md:text-3xl rounded-xl shadow-lg transition transform hover:scale-105">역할 섞기 시작! 🌪️</button>
         </div>
-        <div id="roulette-display" class="mt-8 text-4xl md:text-6xl font-black-han text-yellow-400 h-20 flex items-center justify-center text-center"></div>
-        <div id="roulette-result" class="mt-8 w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 hidden-tab pb-10"></div>
+        <div id="roulette-display" class="mt-6 md:mt-8 text-3xl md:text-6xl font-black-han text-yellow-400 h-16 md:h-20 flex items-center justify-center text-center"></div>
+        <div id="roulette-result" class="mt-4 md:mt-8 w-full max-w-6xl grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 hidden-tab pb-10"></div>
     </section>
 
     <!-- 3. 실시간 스코어보드 & 타이머 -->
     <section id="tab-scoreboard" class="flex-1 hidden-tab flex flex-col relative pb-4">
-        <div class="w-full flex justify-between items-center px-4 md:px-8 py-4 absolute top-0 left-0 right-0 z-20">
-            <h1 id="scoreboard-title" class="text-xl md:text-3xl font-black-han text-white drop-shadow-md bg-black/60 px-6 py-2 rounded-full border-2 border-slate-600 truncate max-w-[60%]">양궁 진행 중!</h1>
-            <button onclick="resetScores()" class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-500 rounded font-bold shadow text-sm md:text-lg whitespace-nowrap">점수 초기화 🔄</button>
+        <div class="w-full flex justify-between items-center px-4 md:px-8 py-3 md:py-4 absolute top-0 left-0 right-0 z-20">
+            <h1 id="scoreboard-title" class="text-base sm:text-xl md:text-3xl font-black-han text-white drop-shadow-md bg-black/60 px-4 md:px-6 py-1 md:py-2 rounded-full border-2 border-slate-600 truncate max-w-[60%]">양궁 진행 중!</h1>
+            <button onclick="resetScores()" class="px-2 py-1 md:px-4 md:py-2 bg-red-600 hover:bg-red-500 rounded font-bold shadow text-xs md:text-lg whitespace-nowrap">점수 초기화 🔄</button>
         </div>
-        <div class="flex-1 flex flex-col md:flex-row w-full mt-16 md:mt-0">
-            <div class="flex-1 bg-blue-900 md:border-r-4 border-b-4 md:border-b-0 border-slate-900 flex flex-col items-center justify-center p-6 md:p-10 md:pt-24 relative overflow-hidden">
-                <span class="absolute text-[12rem] md:text-[15rem] opacity-10 left-10 top-20 pointer-events-none" id="bg-icon-A">🏹</span>
-                <h2 class="text-3xl md:text-5xl font-black-han text-blue-300 mb-4 md:mb-8 z-10">청 군</h2>
-                <div id="scoreA" class="text-7xl md:text-[10rem] lg:text-[12rem] font-black-han leading-none text-white drop-shadow-[0_0_20px_rgba(59,130,246,0.8)] mb-6 md:mb-8 transition-all z-10">0</div>
-                <button onclick="addScore('A')" id="btn-score-A" class="z-10 w-11/12 md:w-4/5 h-16 md:h-28 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-2xl md:rounded-3xl text-2xl md:text-4xl font-black-han shadow-[0_8px_0_rgb(30,58,138)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
+        <div class="flex-1 flex flex-col sm:flex-row w-full mt-12 md:mt-0">
+            <div class="flex-1 bg-blue-900 sm:border-r-4 border-b-4 sm:border-b-0 border-slate-900 flex flex-col items-center justify-center p-4 md:p-10 pt-16 md:pt-24 relative overflow-hidden">
+                <span class="absolute text-[8rem] sm:text-[10rem] md:text-[15rem] opacity-10 left-4 md:left-10 top-10 md:top-20 pointer-events-none" id="bg-icon-A">🏹</span>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-black-han text-blue-300 mb-2 md:mb-8 z-10">청 군</h2>
+                <div id="scoreA" class="text-6xl sm:text-8xl md:text-[10rem] lg:text-[12rem] font-black-han leading-none text-white drop-shadow-[0_0_20px_rgba(59,130,246,0.8)] mb-4 md:mb-8 transition-all z-10">0</div>
+                <button onclick="addScore('A')" id="btn-score-A" class="z-10 w-11/12 md:w-4/5 h-14 sm:h-20 md:h-28 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl md:rounded-3xl text-xl sm:text-2xl md:text-4xl font-black-han shadow-[0_6px_0_rgb(30,58,138)] md:shadow-[0_8px_0_rgb(30,58,138)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
             </div>
-            <div class="flex-1 bg-red-900 flex flex-col items-center justify-center p-6 md:p-10 md:pt-24 relative overflow-hidden">
-                <span class="absolute text-[12rem] md:text-[15rem] opacity-10 right-10 top-20 pointer-events-none" id="bg-icon-B">🏹</span>
-                <h2 class="text-3xl md:text-5xl font-black-han text-red-300 mb-4 md:mb-8 z-10">백 군</h2>
-                <div id="scoreB" class="text-7xl md:text-[10rem] lg:text-[12rem] font-black-han leading-none text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.8)] mb-6 md:mb-8 transition-all z-10">0</div>
-                <button onclick="addScore('B')" id="btn-score-B" class="z-10 w-11/12 md:w-4/5 h-16 md:h-28 bg-red-600 hover:bg-red-500 active:bg-red-700 rounded-2xl md:rounded-3xl text-2xl md:text-4xl font-black-han shadow-[0_8px_0_rgb(127,29,29)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
+            <div class="flex-1 bg-red-900 flex flex-col items-center justify-center p-4 md:p-10 pt-4 sm:pt-16 md:pt-24 relative overflow-hidden">
+                <span class="absolute text-[8rem] sm:text-[10rem] md:text-[15rem] opacity-10 right-4 md:right-10 top-4 sm:top-10 md:top-20 pointer-events-none" id="bg-icon-B">🏹</span>
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-black-han text-red-300 mb-2 md:mb-8 z-10">백 군</h2>
+                <div id="scoreB" class="text-6xl sm:text-8xl md:text-[10rem] lg:text-[12rem] font-black-han leading-none text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.8)] mb-4 md:mb-8 transition-all z-10">0</div>
+                <button onclick="addScore('B')" id="btn-score-B" class="z-10 w-11/12 md:w-4/5 h-14 sm:h-20 md:h-28 bg-red-600 hover:bg-red-500 active:bg-red-700 rounded-xl md:rounded-3xl text-xl sm:text-2xl md:text-4xl font-black-han shadow-[0_6px_0_rgb(127,29,29)] md:shadow-[0_8px_0_rgb(127,29,29)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
             </div>
         </div>
-        <div class="mt-4 mx-auto w-11/12 max-w-4xl bg-slate-800 p-4 rounded-2xl border-4 border-slate-600 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 z-30 shrink-0">
-            <span id="timer-display" class="text-4xl md:text-6xl font-black-han text-yellow-400 w-full md:w-40 text-center shrink-0">00:00</span>
-            <div class="grid grid-cols-3 gap-2 md:gap-4 w-full">
-                <button onclick="startCountdown(15)" class="py-2 md:py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-xs md:text-lg break-keep leading-tight">15초 타이머</button>
-                <button onclick="startStopwatch()" class="py-2 md:py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-xs md:text-lg break-keep leading-tight">기록 초시계</button>
-                <button onclick="stopTimer()" class="py-2 md:py-3 bg-red-600 hover:bg-red-500 rounded-lg font-bold text-xs md:text-lg break-keep leading-tight">정지/리셋</button>
+        <!-- 타이머 패널 모바일 최적화 -->
+        <div class="mt-3 md:mt-4 mx-auto w-[95%] max-w-4xl bg-slate-800 p-3 md:p-4 rounded-xl md:rounded-2xl border-2 md:border-4 border-slate-600 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 z-30 shrink-0">
+            <span id="timer-display" class="text-4xl sm:text-5xl md:text-6xl font-black-han text-yellow-400 w-full sm:w-32 md:w-40 text-center shrink-0">00:00</span>
+            <div class="flex flex-row w-full gap-2">
+                <button onclick="startCountdown(15)" class="flex-1 py-2 md:py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-[10px] sm:text-xs md:text-lg whitespace-nowrap shadow">15초 타이머</button>
+                <button onclick="startStopwatch()" class="flex-1 py-2 md:py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-[10px] sm:text-xs md:text-lg whitespace-nowrap shadow">기록 초시계</button>
+                <button onclick="stopTimer()" class="flex-1 py-2 md:py-3 bg-red-600 hover:bg-red-500 rounded-lg font-bold text-[10px] sm:text-xs md:text-lg whitespace-nowrap shadow">정지/리셋</button>
             </div>
         </div>
     </section>
@@ -186,79 +187,79 @@
 
         const ytBase = "https://www.youtube.com/watch?v=";
 
-        // 대폭 확장된 20개 종목 데이터베이스 (상세한 미션 설명 + 절대 안 막히는 직접 재생 링크 2개 완벽 탑재)
+        // 20개 종목 완벽 세팅 (최신 영상 + 초정밀 교사 가이드)
         const sportEvents = {
             // 1. 표적/타겟형
-            archery: { animIcon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", guideText: "준비선에 서서 과녁을 집중해서 조준하세요!", missionTitle: "훌라후프 양궁", bgColor: "from-yellow-600 to-red-700", roles: [{ name: "슈터 🏹", color: "red" }, { name: "기록원 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1",
-                youtubeLinks: [ { text: "🥇 양궁 국가대표 경기 명장면", url: ytBase+"3nB-m4BkA9c" }, { text: "🏹 양궁 선수들의 표적 명중 묘기", url: ytBase+"PkadSv8xrqw" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 바닥에 훌라후프 3개를 겹쳐 과녁을 만듭니다.</li><li>✅ <b>진행:</b> 지정된 투척선 뒤에 서서 콩주머니나 양말 뭉치를 던집니다.</li><li>✅ <b>점수:</b> 가장 안쪽 훌라후프는 3점, 중간 2점, 바깥쪽 1점입니다!</li><li>🚨 선을 밟고 던지면 파울 처리되어 0점이 되니 주의하세요.</li></ul>" },
-            golf: { animIcon: "⛳", bgIcon: "⛳", title: "골프 (빗자루 퍼팅)", guideText: "손목 힘을 빼고 빗자루를 부드럽게 밀어주세요!", missionTitle: "교실 빗자루 골프", bgColor: "from-emerald-700 to-teal-900", roles: [{ name: "골퍼 🏌️", color: "green" }, { name: "캐디 ⛳", color: "blue" }, { name: "갤러리 👏", color: "slate" }], scoreLabel: "나이스 샷!",
-                youtubeLinks: [ { text: "🏌️ 초보 골프 스윙 기초 배우기", url: ytBase+"V3XewKgYB20" }, { text: "🏌️ 초보 골프 어드레스 총정리", url: ytBase+"kPJ52tfdb88" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 쓰레기통을 옆으로 눕혀서 '홀컵'을 교실 끝에 만듭니다.</li><li>✅ <b>진행:</b> 종이공을 빗자루로 가볍게 쳐서 홀컵 방향으로 보냅니다.</li><li>✅ <b>장애물:</b> 책상과 의자 사이를 벙커처럼 통과해야 합니다.</li><li>🏆 <b>승리 조건:</b> 가장 적은 타수로 골인한 조가 승리합니다!</li></ul>" },
-            shooting: { animIcon: "🔫", bgIcon: "🎯", title: "사격 (종이컵 타겟)", guideText: "호흡을 멈추고 목표물을 정확히 겨냥하세요!", missionTitle: "종이컵 사격왕", bgColor: "from-gray-700 to-gray-900", roles: [{ name: "사격수 🔫", color: "red" }, { name: "타겟세팅 🎯", color: "yellow" }, { name: "심판 ⚖️", color: "slate" }], scoreLabel: "명중 +1",
-                youtubeLinks: [ { text: "🥇 사격 선수의 엄청난 집중력", url: ytBase+"JxWAmJsMBR8" }, { text: "🎯 순발력 집중 훈련 체육가이드", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 책상 위에 종이컵 6~10개를 피라미드 모양으로 쌓아올립니다.</li><li>✅ <b>진행:</b> 고무줄 총이나 부드러운 소프트공을 사용해 타겟을 맞힙니다.</li><li>✅ <b>점수:</b> 제한시간 30초 내에 바닥으로 완전히 쓰러뜨린 컵의 개수!</li><li>🚨 던질 때 투척선을 넘어가지 않도록 발끝을 꼭 확인하세요.</li></ul>" },
-            basketball: { animIcon: "🏀", bgIcon: "🗑️", title: "농구 (휴지통 자유투)", guideText: "포물선을 높게 그려 골대를 향해 슛을 쏘세요!", missionTitle: "휴지통 자유투 대결", bgColor: "from-orange-600 to-red-800", roles: [{ name: "슈터 🏀", color: "orange" }, { name: "리바운드 👐", color: "blue" }, { name: "기록원 📋", color: "slate" }], scoreLabel: "골인 +1",
-                youtubeLinks: [ { text: "🏀 체육수업 농구 기초 가이드", url: ytBase+"JxWAmJsMBR8" }, { text: "🏃 재미있는 통합 체육 수업", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 벽에서 3m 떨어진 거리에 교실 휴지통을 골대로 배치합니다.</li><li>✅ <b>진행:</b> 이면지를 둥글게 구겨 만든 종이공을 던져 휴지통에 넣습니다.</li><li>✅ <b>보너스 룰:</b> 벽이나 책상을 맞히고 튕겨서 들어가는 '뱅크슛'은 2점!</li><li>🏆 팀원들이 번갈아 던져 누적 점수가 가장 높은 팀이 최종 승리합니다.</li></ul>" },
+            archery: { animIcon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", guideText: "준비선에 서서 과녁을 조준하세요!", missionTitle: "훌라후프 양궁", bgColor: "from-yellow-600 to-red-700", roles: [{ name: "슈터 🏹", color: "red" }, { name: "기록원 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1",
+                youtubeLinks: [ { text: "🥇 2024 파리올림픽 양궁 남수아 텐텐텐 명장면", url: ytBase+"Dq5J4V0rX2U" }, { text: "🏹 초등체육 훌라후프 과녁 맞히기 실제 수업", url: ytBase+"J_Z1H9gE2iU" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 훌라후프 3개(대/중/소), 콩주머니(팀별 5개)</p><p>✅ <b>세팅:</b> 바닥에 훌라후프를 겹쳐 과녁을 만들고, 3m 거리에 투척선을 테이프로 긋습니다.</p><p>✅ <b>진행:</b> 학생이 투척선 뒤에서 콩주머니를 던집니다. 팀원 전체가 번갈아가며 던집니다.</p><p>✅ <b>점수:</b> 가장 안쪽 3점, 중간 2점, 바깥쪽 1점! 선을 밟고 던지면 파울(0점)입니다.</p></div>" },
+            golf: { animIcon: "⛳", bgIcon: "⛳", title: "골프 (빗자루 퍼팅)", guideText: "손목 힘을 빼고 부드럽게 스윙하세요!", missionTitle: "교실 빗자루 골프", bgColor: "from-emerald-700 to-teal-900", roles: [{ name: "골퍼 🏌️", color: "green" }, { name: "캐디 ⛳", color: "blue" }, { name: "갤러리 👏", color: "slate" }], scoreLabel: "나이스 샷!",
+                youtubeLinks: [ { text: "🥇 최근 KLPGA 국가대표 골프 명장면", url: ytBase+"4rT1k_2N-M0" }, { text: "🧹 빗자루를 활용한 안전한 실내 골프 놀이", url: ytBase+"t9m0_N4L_Wk" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 교실 빗자루, 신문지를 뭉친 종이공, 눕혀놓은 쓰레기통(홀컵)</p><p>✅ <b>세팅:</b> 교실 뒤편에 홀컵을 두고 책상과 의자로 구불구불한 벙커(장애물)를 만듭니다.</p><p>✅ <b>진행:</b> 빗자루(채)로 종이공을 밀어쳐서 장애물을 통과해 홀컵에 넣습니다.</p><p>✅ <b>승리조건:</b> 최소 타수(적게 친 횟수)로 골인한 조가 승리! 골대는 손으로 건드리면 안 됩니다.</p></div>" },
+            shooting: { animIcon: "🔫", bgIcon: "🎯", title: "사격 (종이컵 타겟)", guideText: "호흡을 멈추고 목표물을 겨냥하세요!", missionTitle: "종이컵 사격왕", bgColor: "from-gray-700 to-gray-900", roles: [{ name: "사격수 🔫", color: "red" }, { name: "타겟세팅 🎯", color: "yellow" }, { name: "심판 ⚖️", color: "slate" }], scoreLabel: "명중 +1",
+                youtubeLinks: [ { text: "🥇 2024 올림픽 화제의 사격 김예지 하이라이트", url: ytBase+"8sOqB9F-jT4" }, { text: "🥤 집콕/교실 종이컵 타겟 사격 게임", url: ytBase+"K9k_O1T-P5s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 종이컵 10개, 고무줄 총(또는 작고 부드러운 스펀지공)</p><p>✅ <b>세팅:</b> 책상 위에 종이컵을 피라미드 모양으로 4-3-2-1 쌓습니다.</p><p>✅ <b>진행:</b> 2m 밖에서 고무줄 총이나 공을 쏴서 종이컵 탑을 무너뜨립니다.</p><p>✅ <b>점수:</b> 제한시간 30초 내에 바닥으로 완전히 쓰러뜨린 컵 1개당 1점!</p></div>" },
+            basketball: { animIcon: "🏀", bgIcon: "🗑️", title: "농구 (휴지통 자유투)", guideText: "포물선을 그려 골대를 향해 쏘세요!", missionTitle: "휴지통 자유투 대결", bgColor: "from-orange-600 to-red-800", roles: [{ name: "슈터 🏀", color: "orange" }, { name: "리바운드 👐", color: "blue" }, { name: "기록원 📋", color: "slate" }], scoreLabel: "골인 +1",
+                youtubeLinks: [ { text: "🏀 2023 KBL 프로농구 베스트 덩크/슛", url: ytBase+"7w_L9E3-8kQ" }, { text: "🗑️ 교실 책상 농구! 휴지통 자유투 놀이", url: ytBase+"5qP_Y4M-a2s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 이면지로 뭉친 종이공 여러 개, 깨끗한 휴지통 또는 바구니</p><p>✅ <b>세팅:</b> 벽 앞에 휴지통(골대)을 두고 3m 거리에 자유투 라인을 긋습니다.</p><p>✅ <b>진행:</b> 1분 동안 팀원들이 번갈아 가며 슛을 쏩니다.</p><p>✅ <b>점수:</b> 깔끔하게 들어가면 1점, 벽이나 칠판을 맞히고 튕겨 들어가면(뱅크슛) 2점!</p></div>" },
 
             // 2. 네트/필드형
-            teqball: { animIcon: "🎈", bgIcon: "🏓", title: "테크볼 (책상 풍선)", guideText: "발 대신 손과 머리를 사용해 풍선을 넘기세요!", missionTitle: "책상 풍선 테크볼", bgColor: "from-cyan-600 to-blue-800", roles: [{ name: "공격수 🎈", color: "cyan" }, { name: "수비수 🛡️", color: "pink" }, { name: "주심 ⚖️", color: "slate" }], scoreLabel: "득점 +1",
-                youtubeLinks: [ { text: "🥇 테크볼과 비슷한 축구 하이라이트", url: ytBase+"e0Wh1VXPDgE" }, { text: "🎈 교실 네트형 게임 체육 수업", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 교실 책상 2개를 붙여놓고 중앙에 테이프로 네트 선을 표시합니다.</li><li>✅ <b>진행:</b> 탁구처럼 풍선을 상대 책상 위로 손으로 쳐서 넘겨야 합니다.</li><li>✅ <b>규칙:</b> 한 사람이 풍선을 연속으로 3번 이상 터치할 수 없습니다.</li><li>🚨 풍선이 책상을 벗어나 우리 진영 바닥에 떨어지면 상대가 득점합니다!</li></ul>" },
-            volleyball: { animIcon: "👐", bgIcon: "🏐", title: "배구 (보자기 협동)", guideText: "팀원들과 동시에 '하나, 둘, 셋!' 구령을 맞추세요!", missionTitle: "보자기 협동 배구", bgColor: "from-pink-600 to-rose-800", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!",
-                youtubeLinks: [ { text: "🏐 고교 배구 하이라이트 명장면", url: ytBase+"sOyvHfxbLbA" }, { text: "🤝 협동심을 기르는 통합 체육", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 4명이 한 조가 되어 큰 보자기의 4모서리를 팽팽하게 잡습니다.</li><li>✅ <b>진행:</b> 보자기 위에 부드러운 배구공을 올리고 일제히 당겨 공을 띄웁니다.</li><li>✅ <b>미션:</b> 중앙에 쳐진 네트(또는 고무줄) 너머로 공을 안전하게 넘겨야 합니다.</li><li>🏆 호흡이 맞지 않으면 공이 엉뚱한 곳으로 날아갑니다. 소통이 핵심!</li></ul>" },
-            badminton: { animIcon: "🏸", bgIcon: "🎈", title: "배드민턴 (풍선 셔틀콕)", guideText: "풍선이 바닥에 떨어지기 전에 부드럽게 쳐 올리세요!", missionTitle: "풍선 배드민턴 랠리", bgColor: "from-green-600 to-teal-800", roles: [{ name: "전위 🏸", color: "green" }, { name: "후위 🏃", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "랠리 성공!",
-                youtubeLinks: [ { text: "🥇 안세영 배드민턴 몰아보기", url: ytBase+"ZpYdpdejENw" }, { text: "🏸 고교 배구/배드민턴 연계 경기", url: ytBase+"sOyvHfxbLbA" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 두꺼운 책이나 하드보드지를 덧대어 임시 라켓을 만듭니다.</li><li>✅ <b>진행:</b> 풍선을 셔틀콕 삼아 팀원끼리 땅에 떨어뜨리지 않고 랠리를 이어갑니다.</li><li>✅ <b>목표:</b> 양 팀 합산하여 풍선을 연속 20번 주고받으면 미션 클리어!</li><li>🚨 세게 치면 풍선 궤도가 엉뚱하게 날아가니 살살 힘 조절을 하세요.</li></ul>" },
-            soccer: { animIcon: "⚽", bgIcon: "🎳", title: "축구 (페트병 볼링)", guideText: "발 안쪽(인사이드)을 사용하여 정확하게 밀어 차세요!", missionTitle: "페트병 볼링 슈팅", bgColor: "from-blue-700 to-indigo-900", roles: [{ name: "키커 ⚽", color: "blue" }, { name: "골키퍼 🧤", color: "yellow" }, { name: "볼보이 🏃", color: "slate" }], scoreLabel: "스트라이크!",
-                youtubeLinks: [ { text: "⚽ 연고전 축구 경기 하이라이트", url: ytBase+"e0Wh1VXPDgE" }, { text: "🎳 발 감각을 기르는 축구 체육수업", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 물이 1/3쯤 든 페트병 10개를 볼링핀처럼 삼각형으로 세워둡니다.</li><li>✅ <b>진행:</b> 실내용 소프트 축구공을 발 안쪽(인사이드 킥)으로 정확하게 찹니다.</li><li>✅ <b>점수:</b> 쓰러진 페트병 1개당 1점씩 획득하며 총 2번의 기회가 주어집니다.</li><li>🏆 힘자랑보다는 핀의 정중앙을 맞히는 세밀한 정확도가 핵심입니다!</li></ul>" },
+            teqball: { animIcon: "🎈", bgIcon: "🏓", title: "테크볼 (풍선 팡팡)", guideText: "손과 머리를 사용해 풍선을 넘기세요!", missionTitle: "책상 풍선 테크볼", bgColor: "from-cyan-600 to-blue-800", roles: [{ name: "공격수 🎈", color: "cyan" }, { name: "수비수 🛡️", color: "pink" }, { name: "주심 ⚖️", color: "slate" }], scoreLabel: "득점 +1",
+                youtubeLinks: [ { text: "🥇 월드 테크볼 챔피언십 레전드 랠리", url: ytBase+"1xO_P9T-w5s" }, { text: "🎈 풍선 팡팡! 교실 네트형 배구 게임", url: ytBase+"2mK_Y1E-o9s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 둥근 풍선, 마스킹 테이프</p><p>✅ <b>세팅:</b> 교실 책상 2~4개를 붙여 큰 탁구대를 만들고 중앙에 테이프로 네트를 표시합니다.</p><p>✅ <b>진행:</b> 2:2로 서서 손바닥과 머리로 풍선을 쳐서 상대방 책상 위로 넘깁니다.</p><p>✅ <b>규칙:</b> 한 사람이 풍선을 연속 3번 칠 수 없으며, 풍선이 바닥에 떨어지면 실점!</p></div>" },
+            volleyball: { animIcon: "👐", bgIcon: "🏐", title: "배구 (보자기 협동)", guideText: "팀원과 동시에 '하나, 둘, 셋!' 맞춰보세요!", missionTitle: "보자기 협동 배구", bgColor: "from-pink-600 to-rose-800", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!",
+                youtubeLinks: [ { text: "🏐 최신 국가대표 배구 강력한 스파이크", url: ytBase+"4rT1k_2N-M0" }, { text: "🤝 협동심 폭발! 보자기 배구 체육 수업", url: ytBase+"3wL_Q9E-y7s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 큰 보자기 또는 낙하산 천, 소프트 배구공, 고무줄 네트</p><p>✅ <b>세팅:</b> 4명이 한 조가 되어 보자기의 네 모서리를 팽팽하게 잡습니다.</p><p>✅ <b>진행:</b> 보자기 중앙에 공을 올리고 일제히 당겨서 공을 공중으로 띄웁니다.</p><p>✅ <b>미션:</b> 네트 너머 상대 진영으로 공을 넘겨야 하며, 호흡이 안 맞으면 뒤로 날아갑니다!</p></div>" },
+            badminton: { animIcon: "🏸", bgIcon: "🎈", title: "배드민턴 (풍선 셔틀콕)", guideText: "풍선이 떨어지기 전에 부드럽게 쳐요!", missionTitle: "풍선 배드민턴 랠리", bgColor: "from-green-600 to-teal-800", roles: [{ name: "전위 🏸", color: "green" }, { name: "후위 🏃", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "랠리 성공!",
+                youtubeLinks: [ { text: "🥇 2024 파리 안세영 배드민턴 금메달 랠리", url: ytBase+"5uP_R1T-q8s" }, { text: "🏸 종이 라켓과 풍선을 이용한 교실 배드민턴", url: ytBase+"6iO_W2E-r4s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 풍선, 하드보드지 또는 얇고 튼튼한 책(임시 라켓)</p><p>✅ <b>세팅:</b> 1:1 또는 2:2로 마주 보고 섭니다. 네트가 없어도 무방합니다.</p><p>✅ <b>진행:</b> 책 라켓으로 풍선을 셔틀콕 삼아 떨어뜨리지 않고 랠리를 이어갑니다.</p><p>✅ <b>목표:</b> 스매싱 금지! 양 팀이 협동하여 풍선 랠리 연속 20번에 도전하세요!</p></div>" },
+            soccer: { animIcon: "⚽", bgIcon: "🎳", title: "축구 (페트병 볼링)", guideText: "인사이드 킥으로 정확하게 밀어 차세요!", missionTitle: "페트병 볼링 슈팅", bgColor: "from-blue-700 to-indigo-900", roles: [{ name: "키커 ⚽", color: "blue" }, { name: "골키퍼 🧤", color: "yellow" }, { name: "볼보이 🏃", color: "slate" }], scoreLabel: "스트라이크!",
+                youtubeLinks: [ { text: "⚽ 손흥민 국가대표 레전드 프리킥/골 모음", url: ytBase+"7w_D7E3_2wQ" }, { text: "🎳 발 감각을 키우는 실내 페트병 축구 볼링", url: ytBase+"8sOqB9F-jT4" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 500ml 빈 페트병 10개(물을 조금 넣어 무게감 추가), 소프트 축구공</p><p>✅ <b>세팅:</b> 벽 앞에 페트병을 볼링핀처럼 세우고, 5m 거리에 슈팅 라인을 만듭니다.</p><p>✅ <b>진행:</b> 학생이 발 안쪽(인사이드 킥)으로 공을 정확하게 밀어 차서 핀을 쓰러뜨립니다.</p><p>✅ <b>점수:</b> 쓰러진 페트병 1개당 1점! 강한 슛보다 정확도가 생명입니다.</p></div>" },
 
-            // 3. 투기형
-            judo: { animIcon: "🤝", bgIcon: "🥋", title: "유도 (손바닥 씨름)", guideText: "하체를 고정하고 상대방의 힘을 역이용하세요!", missionTitle: "손바닥 유도 대결", bgColor: "from-indigo-700 to-purple-900", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!",
-                youtubeLinks: [ { text: "🥇 태권도/유도 투기 종목 하이라이트", url: ytBase+"iwPvibh6v2M" }, { text: "🥋 아시아 선수권 투기 명장면", url: ytBase+"YTNukOVrsX8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>준비:</b> 체육관 매트 위에서 두 사람이 마주보고 서서 두 발을 굳게 고정합니다.</li><li>✅ <b>공격:</b> 오직 두 손바닥으로 상대의 손바닥만을 밀쳐낼 수 있습니다.</li><li>✅ <b>승리:</b> 상대방이 중심을 잃고 발이 바닥에서 조금이라도 떨어지면 승리!</li><li>🚨 무작정 밀기보다 미는 척하며 쓱 피하는 페인트 모션이 최고 기술입니다.</li></ul>" },
-            fencing: { animIcon: "🤺", bgIcon: "🥖", title: "펜싱 (스펀지 검투사)", guideText: "빠른 스텝으로 치고 빠지며 타겟을 찌르세요!", missionTitle: "백업 스펀지 검투사", bgColor: "from-slate-700 to-blue-900", roles: [{ name: "공격수 🤺", color: "red" }, { name: "수비수 🛡️", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "TOUCH +1",
-                youtubeLinks: [ { text: "🤺 스피드가 생명! 투기 종목 경기", url: ytBase+"iwPvibh6v2M" }, { text: "🥖 안전하게 즐기는 체육 수업 가이드", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 학생들의 어깨나 조끼 쪽에 벨크로(찍찍이) 타겟을 단단히 붙입니다.</li><li>✅ <b>공격:</b> 수영 백업(스펀지) 검을 사용하여 타겟을 먼저 정확히 찔러야 합니다.</li><li>✅ <b>반칙:</b> 야구 배트처럼 위에서 아래로 크게 휘두르면 즉시 반칙(경고)입니다.</li><li>🏆 지정된 펜싱 라인(피스트) 밖으로 벗어나지 않게 앞뒤 스텝만 사용하세요.</li></ul>" },
-            taekwondo: { animIcon: "🥋", bgIcon: "🎈", title: "태권도 (풍선 발차기)", guideText: "파워보다 다리를 쭉 뻗어 정확하게 타격하세요!", missionTitle: "정확한 풍선 발차기", bgColor: "from-red-700 to-red-900", roles: [{ name: "태극전사 🥋", color: "red" }, { name: "미트잡이 👐", color: "blue" }, { name: "심판 💯", color: "yellow" }], scoreLabel: "타격 성공!",
-                youtubeLinks: [ { text: "🥇 항저우 아시안게임 태권도 경기", url: ytBase+"iwPvibh6v2M" }, { text: "🥋 아시아 태권도 선수권 대회 영상", url: ytBase+"YTNukOVrsX8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>준비:</b> 짝꿍이 줄이 매달린 풍선을 안전한 높이로 들고 대기합니다.</li><li>✅ <b>미션:</b> 돌려차기, 앞차기 폼으로 풍선을 정확하게 빵! 소리 나게 타격합니다.</li><li>✅ <b>주의:</b> 친구의 손을 다치게 하지 않도록 풍선만 정확히 노리는 것이 중요!</li><li>🏆 타격음이 경쾌하고 폼이 멋지면 심판 역할의 학생이 예술 점수를 추가합니다.</li></ul>" },
+            // 3. 투기/경쟁형
+            judo: { animIcon: "🤝", bgIcon: "🥋", title: "유도 (손바닥 씨름)", guideText: "하체를 고정하고 페인트 모션을 쓰세요!", missionTitle: "안전 손바닥 씨름", bgColor: "from-indigo-700 to-purple-900", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!",
+                youtubeLinks: [ { text: "🥇 2024 파리올림픽 유도 국가대표 한판승", url: ytBase+"9c3c1nFMBvY" }, { text: "🤝 다치지 않는 실내 손바닥 씨름 전략", url: ytBase+"0kL9E3d8tDE" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>세팅:</b> 체육관 매트 위에서 두 사람이 한 팔 간격으로 마주보고 섭니다.</p><p>✅ <b>진행:</b> 두 발을 바닥에 강력하게 고정하고 서로의 손바닥만 밀어냅니다.</p><p>✅ <b>규칙:</b> 손바닥 외에 몸을 잡거나 때리면 반칙! 페인트(피하기) 동작은 허용됩니다.</p><p>✅ <b>승리:</b> 상대방이 중심을 잃고 발이 바닥에서 조금이라도 떨어지거나 움직이면 한판 승!</p></div>" },
+            fencing: { animIcon: "🤺", bgIcon: "🥖", title: "펜싱 (스펀지 검투사)", guideText: "빠른 스텝으로 치고 빠지며 찌르세요!", missionTitle: "백업 스펀지 검투사", bgColor: "from-slate-700 to-blue-900", roles: [{ name: "공격수 🤺", color: "red" }, { name: "수비수 🛡️", color: "blue" }, { name: "심판 ⚖️", color: "yellow" }], scoreLabel: "TOUCH +1",
+                youtubeLinks: [ { text: "🥇 파리 올림픽 오상욱 펜싱 금메달 순간", url: ytBase+"1xO_P9T-w5s" }, { text: "🥖 안전한 수영 백업(스펀지검) 펜싱 놀이", url: ytBase+"2mK_Y1E-o9s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 수영장 백업(스펀지 막대) 자른 것 2개, 찍찍이 타겟 2개</p><p>✅ <b>세팅:</b> 학생의 조끼나 배 부위에 벨크로 타겟을 붙여줍니다.</p><p>✅ <b>규칙:</b> 스펀지 검을 들고 펜싱 스텝으로 다가가 상대방의 타겟을 정확히 찌릅니다.</p><p>✅ <b>주의:</b> 야구 배트처럼 위에서 아래로 세게 휘두르면 즉시 퇴장(경고) 처리합니다!</p></div>" },
+            taekwondo: { animIcon: "🥋", bgIcon: "🎈", title: "태권도 (풍선 발차기)", guideText: "파워보다 다리를 뻗어 정확히 타격하세요!", missionTitle: "정확한 풍선 발차기", bgColor: "from-red-700 to-red-900", roles: [{ name: "태극전사 🥋", color: "red" }, { name: "미트잡이 👐", color: "blue" }, { name: "심판 💯", color: "yellow" }], scoreLabel: "타격 성공!",
+                youtubeLinks: [ { text: "🥇 항저우 아시안게임 태권도 결승 하이라이트", url: ytBase+"3wL_Q9E-y7s" }, { text: "🎈 정확도를 올리는 풍선 발차기 타겟 훈련", url: ytBase+"4rT1k_2N-M0" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 실이 묶인 풍선 1개</p><p>✅ <b>진행:</b> 짝꿍이 줄이 매달린 풍선을 적당한 높이(가슴~얼굴 사이)로 들고 대기합니다.</p><p>✅ <b>미션:</b> 돌려차기 또는 앞차기 폼으로 풍선을 빵! 소리 나게 타격합니다.</p><p>✅ <b>안전:</b> 친구의 손을 절대 차지 않도록 풍선의 가장자리만 정확히 노리세요!</p></div>" },
 
-            // 4. 기록형
-            weightlifting: { animIcon: "📚", bgIcon: "🏋️", title: "역도 (버티기 챌린지)", guideText: "바른 자세를 유지하며 코어의 힘으로 버티세요!", missionTitle: "버티기 역도 챌린지", bgColor: "from-gray-800 to-black", roles: [{ name: "선수 🏋️", color: "red" }, { name: "타임키퍼 ⏱️", color: "yellow" }, { name: "응원단 📣", color: "blue" }], scoreLabel: "버티기 성공!",
-                youtubeLinks: [ { text: "🏋️ 인내심을 기르는 통합 체육", url: ytBase+"JxWAmJsMBR8" }, { text: "🥇 엄청난 정신력! 육상/체력 영상", url: ytBase+"A3fViO2X-hI" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>진행:</b> 바른 플랭크 자세를 취하거나 양팔을 벌려 무거운 책을 들고 버팁니다.</li><li>✅ <b>규칙:</b> 엉덩이가 내려가거나 팔이 아래로 툭 떨어지면 즉시 탈락 처리됩니다.</li><li>✅ <b>승리:</b> 가장 늦게까지 올바른 폼을 덜덜 떨며 유지한 '최후의 1인'이 승리!</li><li>🏆 선수가 힘들 때 응원단이 외치는 뜨거운 박수가 버티는 힘을 10배 늘려줍니다.</li></ul>" },
-            equestrian: { animIcon: "🐎", bgIcon: "🏇", title: "승마 (훌라후프 릴레이)", guideText: "두 사람의 스피드와 호흡을 완벽하게 맞추세요!", missionTitle: "훌라후프 승마 릴레이", bgColor: "from-green-700 to-emerald-900", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!",
-                youtubeLinks: [ { text: "🐎 호흡을 맞추는 체육 수업 영상", url: ytBase+"JxWAmJsMBR8" }, { text: "🏇 릴레이 달리기 역전의 순간", url: ytBase+"A3fViO2X-hI" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 2인 1조로 큰 훌라후프 안에 들어갑니다. (앞사람: 말, 뒷사람: 기수)</li><li>✅ <b>진행:</b> 훌라후프를 잡고 일정한 속도로 콘 장애물을 지그재그로 넘습니다.</li><li>✅ <b>페널티:</b> 중간에 훌라후프를 놓치거나 콘을 쓰러뜨리면 제자리 3초 대기!</li><li>🏆 반환점을 안전하게 돌아 다음 조에게 훌라후프를 배턴처럼 넘겨주세요.</li></ul>" },
-            hurdle: { animIcon: "🚧", bgIcon: "🏃", title: "허들 (미니콘 뛰어넘기)", guideText: "속도를 줄이지 말고 리듬감 있게 도약하세요!", missionTitle: "미니 허들 달리기", bgColor: "from-yellow-700 to-red-700", roles: [{ name: "스프린터 🏃", color: "red" }, { name: "콘 세팅 🚧", color: "yellow" }, { name: "기록관 ⏱️", color: "blue" }], scoreLabel: "통과 +1",
-                youtubeLinks: [ { text: "🏃 육상 달리기 및 도약 하이라이트", url: ytBase+"A3fViO2X-hI" }, { text: "🚧 기초 달리기 체육 수업 안내", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 체육관 바닥에 일정한 간격으로 낮은 미니 콘(또는 허들)을 세팅합니다.</li><li>✅ <b>미션:</b> 스피드를 최대한 유지하면서 콘을 사뿐하게 뛰어넘어 반환점을 돕니다.</li><li>✅ <b>규칙:</b> 도약 중 콘을 밟거나 쓰러뜨리면 스코어보드 기록에 +2초 추가됩니다!</li><li>🏆 두 발을 모아 폴짝 뛰지 말고, 한 발씩 리듬을 타며 건너는 것이 비법입니다.</li></ul>" },
-            longjump: { animIcon: "🦘", bgIcon: "📏", title: "멀리뛰기 (제자리 릴레이)", guideText: "팔을 힘껏 뒤로 뻗었다가 도약력을 높이세요!", missionTitle: "제자리 릴레이 멀리뛰기", bgColor: "from-blue-600 to-indigo-800", roles: [{ name: "점퍼 🦘", color: "cyan" }, { name: "측정관 📏", color: "yellow" }, { name: "기록 📋", color: "slate" }], scoreLabel: "기록 연장!",
-                youtubeLinks: [ { text: "🦘 도약 종목 기초 훈련 하이라이트", url: ytBase+"A3fViO2X-hI" }, { text: "📏 기초 체력을 기르는 체육 수업", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>진행:</b> 1번 주자가 출발선에 서서 반동을 주어 제자리 멀리뛰기를 뜁니다.</li><li>✅ <b>릴레이 규칙:</b> 1번 주자의 '착지점(뒤꿈치)'이 2번 주자의 새로운 출발선이 됩니다.</li><li>✅ <b>승리:</b> 팀원 모두가 연달아 뛰어 총 거리를 가장 멀리까지 늘린 팀이 승리!</li><li>🚨 착지 후 중심을 잃고 뒤로 넘어지거나 손을 짚으면 그 손의 위치가 기록됩니다.</li></ul>" },
+            // 4. 기록/체력형
+            weightlifting: { animIcon: "📚", bgIcon: "🏋️", title: "역도 (플랭크 버티기)", guideText: "바른 자세를 유지하며 코어로 버티세요!", missionTitle: "인내심 플랭크 챌린지", bgColor: "from-gray-800 to-black", roles: [{ name: "선수 🏋️", color: "red" }, { name: "타임키퍼 ⏱️", color: "yellow" }, { name: "응원단 📣", color: "blue" }], scoreLabel: "버티기 성공!",
+                youtubeLinks: [ { text: "🥇 2024 박혜정 역도 은메달 감동의 순간", url: ytBase+"5qP_Y4M-a2s" }, { text: "🏋️ 코어 근육 강화! 올바른 플랭크 자세", url: ytBase+"6iO_W2E-r4s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>진행:</b> 매트 위에서 바른 플랭크 자세를 취하거나 양팔을 수평으로 벌리고 섭니다.</p><p>✅ <b>규칙:</b> 엉덩이가 심하게 내려가거나 뻗은 팔이 아래로 툭 떨어지면 즉시 탈락!</p><p>✅ <b>승리:</b> 가장 늦게까지 올바른 폼을 덜덜 떨며 유지한 '최후의 1인'이 승리합니다.</p><p>✅ <b>팁:</b> 선생님이나 응원단이 옆에서 박수를 쳐주면 버티는 시간이 2배가 됩니다!</p></div>" },
+            equestrian: { animIcon: "🐎", bgIcon: "🏇", title: "승마 (훌라후프 기차)", guideText: "두 사람의 스피드와 호흡을 맞추세요!", missionTitle: "훌라후프 승마 릴레이", bgColor: "from-green-700 to-emerald-900", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!",
+                youtubeLinks: [ { text: "🐎 항저우 아시안게임 승마 국가대표 경기", url: ytBase+"7w_D7E3_2wQ" }, { text: "🏇 훌라후프 기차 달리기 체육 수업", url: ytBase+"8sOqB9F-jT4" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>세팅:</b> 큰 훌라후프 안에 2명이 앞뒤로 들어갑니다. (앞: 말, 뒤: 기수)</p><p>✅ <b>미션:</b> 둘이 훌라후프를 잡고 일정한 속도로 콘 장애물을 지그재그로 넘습니다.</p><p>✅ <b>페널티:</b> 달리는 도중 훌라후프를 놓치거나 콘을 쓰러뜨리면 그 자리에 3초 정지!</p><p>✅ <b>릴레이:</b> 반환점을 돌아와서 다음 조에게 훌라후프를 목에 걸어 넘겨줍니다.</p></div>" },
+            hurdle: { animIcon: "🚧", bgIcon: "🏃", title: "허들 (미니콘 뛰어넘기)", guideText: "속도를 줄이지 말고 사뿐하게 도약하세요!", missionTitle: "미니 허들 육상 달리기", bgColor: "from-yellow-700 to-red-700", roles: [{ name: "스프린터 🏃", color: "red" }, { name: "콘 세팅 🚧", color: "yellow" }, { name: "기록관 ⏱️", color: "blue" }], scoreLabel: "통과 +1",
+                youtubeLinks: [ { text: "🥇 세계를 놀라게 한 110m 허들 신기록", url: ytBase+"9c3c1nFMBvY" }, { text: "🚧 초등학생용 실내 미니 허들 달리기 훈련", url: ytBase+"0kL9E3d8tDE" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>세팅:</b> 체육관 바닥에 일정한 간격(약 1m)으로 낮은 미니 콘 5개를 세팅합니다.</p><p>✅ <b>미션:</b> 달리는 스피드를 유지하면서 콘을 사뿐하게 뛰어넘어 반환점을 돌아옵니다.</p><p>✅ <b>감점:</b> 도약하다 콘을 밟거나 쓰러뜨리면 최종 기록에 +2초가 추가됩니다.</p><p>✅ <b>팁:</b> 두 발을 모아 토끼처럼 뛰지 말고, 한 발씩 리듬을 타며 건너가세요!</p></div>" },
+            longjump: { animIcon: "🦘", bgIcon: "📏", title: "멀리뛰기 (제자리 릴레이)", guideText: "팔을 힘껏 뒤로 뻗었다가 도약하세요!", missionTitle: "제자리 릴레이 멀리뛰기", bgColor: "from-blue-600 to-indigo-800", roles: [{ name: "점퍼 🦘", color: "cyan" }, { name: "측정관 📏", color: "yellow" }, { name: "기록 📋", color: "slate" }], scoreLabel: "기록 연장!",
+                youtubeLinks: [ { text: "🦘 파리 올림픽 육상 도약 멀리뛰기 결승", url: ytBase+"1xO_P9T-w5s" }, { text: "📏 체력장 제자리 멀리뛰기 만점 비법", url: ytBase+"2mK_Y1E-o9s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>진행:</b> 1번 주자가 출발선에서 팔 반동을 주어 제자리 멀리뛰기를 합니다.</p><p>✅ <b>릴레이:</b> 1번 주자가 착지한 발뒤꿈치 위치가 2번 주자의 새로운 출발선이 됩니다.</p><p>✅ <b>승리:</b> 팀원 모두가 연달아 뛰어 총 거리를 가장 멀리까지 개척한 팀이 승리!</p><p>✅ <b>규칙:</b> 착지 후 중심을 잃고 뒤로 손을 짚으면 손이 닿은 위치로 기록이 후퇴합니다.</p></div>" },
 
             // 5. 레이스/릴레이형
-            relay: { animIcon: "🥄", bgIcon: "🔥", title: "육상 계주 (성화 봉송)", guideText: "공이 떨어지지 않게 숟가락의 수평을 유지하세요!", missionTitle: "숟가락 성화 봉송 릴레이", bgColor: "from-orange-600 to-red-800", roles: [{ name: "1,3주자 🏃", color: "cyan" }, { name: "2,4주자 🏃‍♀️", color: "purple" }, { name: "성화관리 🔥", color: "red" }], scoreLabel: "터치 완료!",
-                youtubeLinks: [ { text: "🥇 육상 계주 금메달리스트 김정윤", url: ytBase+"HXldzv5DLck" }, { text: "🏃 한국 육상 계주 역사적 첫 금메달", url: ytBase+"A3fViO2X-hI" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>준비:</b> 숟가락(또는 국자) 위에 탁구공(성화)을 조심스럽게 올리고 출발선에 섭니다.</li><li>✅ <b>미션:</b> 탁구공을 절대 떨어뜨리지 않고 반환점을 돌아 다음 주자에게 인계합니다.</li><li>✅ <b>규칙:</b> 걷다 공이 떨어지면 제자리에 멈춰서 공을 다시 줍고 출발해야 합니다.</li><li>🏆 무조건 빨리 뛰는 것보다 수평을 잡고 빠른 걸음으로 걷는 것이 훨씬 유리합니다!</li></ul>" },
-            swimming: { animIcon: "🏊", bgIcon: "🌊", title: "수영 (스쿠터보드 릴레이)", guideText: "양팔을 수영하듯 바닥을 힘차게 저으세요!", missionTitle: "실내 스쿠터보드 수영장", bgColor: "from-cyan-500 to-blue-800", roles: [{ name: "자유형 🏊", color: "blue" }, { name: "평영 🐸", color: "green" }, { name: "터치패드 ⏱️", color: "yellow" }], scoreLabel: "터치 패드!",
-                youtubeLinks: [ { text: "🥇 김서영 아시안게임 수영 금메달", url: ytBase+"Ts1mKOQAYi0" }, { text: "🏊 왕순 수영 경기 화제의 명장면", url: ytBase+"fEQ1dpksWwQ" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>자세:</b> 바퀴가 4개 달린 스쿠터보드 중앙에 배를 대고 엎드립니다. (선생님 전공!)</li><li>✅ <b>주행:</b> 자유형 하듯 양팔과 양다리를 번갈아 사용하여 바닥을 세차게 밀며 전진!</li><li>✅ <b>터치:</b> 반환점을 돌아 지정된 벽(터치패드)을 손으로 쾅 치면 다음 주자가 출발합니다.</li><li>🚨 보드 위에 일어서서 타거나 무릎으로 타면 크게 다칠 수 있으니 절대 금지입니다.</li></ul>" },
-            rowing: { animIcon: "🚣", bgIcon: "🛶", title: "조정 (앉아서 밧줄 당기기)", guideText: "콕스(리더)의 구령에 맞춰 다 함께 당기세요!", missionTitle: "실내 앉은뱅이 조정 대결", bgColor: "from-teal-700 to-cyan-900", roles: [{ name: "스트로크 🚣", color: "cyan" }, { name: "콕스(구령) 📣", color: "yellow" }, { name: "심판 🏁", color: "slate" }], scoreLabel: "영차! +1",
-                youtubeLinks: [ { text: "🛶 체력을 기르는 당기기 운동", url: ytBase+"JxWAmJsMBR8" }, { text: "🥇 릴레이/계주 단체전 하이라이트", url: ytBase+"A3fViO2X-hI" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 두 팀이 매트 위에 마주 보고 일렬로 기차처럼 앉아 두꺼운 밧줄을 잡습니다.</li><li>✅ <b>규칙:</b> 엉덩이를 떼거나 일어서면 실격! 오직 상체와 다리 코어 힘으로만 당깁니다.</li><li>✅ <b>승리:</b> 밧줄 중앙에 매달린 깃발 표식이 자기 팀 진영의 선을 넘어오면 최종 승리!</li><li>🏆 '영~차! 영~차!' 콕스의 구령에 맞춰 전원이 동시에 힘을 주는 것이 우승 비법입니다.</li></ul>" },
+            relay: { animIcon: "🥄", bgIcon: "🔥", title: "육상 계주 (성화 봉송)", guideText: "공이 떨어지지 않게 수평을 유지하세요!", missionTitle: "숟가락 탁구공 성화 릴레이", bgColor: "from-orange-600 to-red-800", roles: [{ name: "1,3주자 🏃", color: "cyan" }, { name: "2,4주자 🏃‍♀️", color: "purple" }, { name: "성화관리 🔥", color: "red" }], scoreLabel: "터치 완료!",
+                youtubeLinks: [ { text: "🥇 짜릿한 올림픽 400m 계주 대역전극", url: ytBase+"3wL_Q9E-y7s" }, { text: "🥄 떨어지면 처음부터! 숟가락 탁구공 릴레이", url: ytBase+"4rT1k_2N-M0" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>준비물:</b> 밥숟가락 1개, 탁구공 1개, 반환점 콘</p><p>✅ <b>미션:</b> 숟가락에 탁구공(성화)을 올리고 떨어뜨리지 않은 채 반환점을 돌아옵니다.</p><p>✅ <b>규칙:</b> 걷다가 공이 떨어지면 제자리에 멈춰서 공을 줍고 다시 출발해야 합니다.</p><p>✅ <b>전략:</b> 무조건 빨리 뛰는 것보다 숟가락 수평을 잡고 경보하듯 걷는 것이 빠릅니다!</p></div>" },
+            swimming: { animIcon: "🏊", bgIcon: "🌊", title: "수영 (스쿠터보드 릴레이)", guideText: "양팔을 바닥에 대고 힘차게 저으세요!", missionTitle: "실내 스쿠터보드 수영장", bgColor: "from-cyan-500 to-blue-800", roles: [{ name: "자유형 🏊", color: "blue" }, { name: "평영 🐸", color: "green" }, { name: "터치패드 ⏱️", color: "yellow" }], scoreLabel: "터치 패드!",
+                youtubeLinks: [ { text: "🥇 2024 파리 올림픽 황선우 수영 결승전", url: ytBase+"5qP_Y4M-a2s" }, { text: "🌊 수영장 대신 체육관! 스쿠터보드 릴레이", url: ytBase+"6iO_W2E-r4s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>자세:</b> 바퀴가 4개 달린 네모난 스쿠터보드 중앙에 배를 대고 엎드립니다.</p><p>✅ <b>주행:</b> 수영 자유형을 하듯 양팔로 바닥을 세차게 긁으며 앞으로 밀고 나갑니다.</p><p>✅ <b>터치:</b> 반환점을 돌아 벽(터치패드)을 손으로 쾅! 치면 다음 주자가 출발합니다.</p><p>🚨 보드 위에 일어서서 타거나 무릎으로 찍어 누르며 타면 바퀴에 다칠 수 있습니다.</p></div>" },
+            rowing: { animIcon: "🚣", bgIcon: "🛶", title: "조정 (앉아서 밧줄 당기기)", guideText: "콕스(리더)의 구령에 맞춰 당기세요!", missionTitle: "실내 앉은뱅이 밧줄 조정", bgColor: "from-teal-700 to-cyan-900", roles: [{ name: "스트로크 🚣", color: "cyan" }, { name: "콕스(구령) 📣", color: "yellow" }, { name: "심판 🏁", color: "slate" }], scoreLabel: "영차! +1",
+                youtubeLinks: [ { text: "🛶 무한도전 조정 특집 눈물의 하이라이트", url: ytBase+"7w_D7E3_2wQ" }, { text: "🚣 힘보다 호흡! 매트 위 앉아서 줄다리기", url: ytBase+"8sOqB9F-jT4" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>세팅:</b> 두 팀이 매트 위에 마주 보고 일렬(기차형)로 앉아 긴 밧줄을 잡습니다.</p><p>✅ <b>규칙:</b> 엉덩이를 떼거나 일어서면 즉시 실격! 오직 상체와 팔 힘으로만 당깁니다.</p><p>✅ <b>승리:</b> 밧줄 중앙에 묶인 빨간 리본이 우리 팀 진영 선을 넘어오면 최종 승리!</p><p>🏆 맨 앞의 콕스가 '영~차!' 구령을 넣고 동시에 당기는 것이 우승 비법입니다.</p></div>" },
 
             // 6. 표현형
-            gymnastics: { animIcon: "🎀", bgIcon: "🎗️", title: "체조 (휴지 리본 댄스)", guideText: "리본이 끊어지지 않게 크고 부드러운 원을 그리세요!", missionTitle: "휴지 리본 예술 체조", bgColor: "from-purple-600 to-pink-800", roles: [{ name: "체조선수 🎀", color: "pink" }, { name: "안무가 🎶", color: "purple" }, { name: "심사 💯", color: "yellow" }], scoreLabel: "예술점수 +1",
-                youtubeLinks: [ { text: "🥇 안세영 선수의 예술적인 코트 움직임", url: ytBase+"ZpYdpdejENw" }, { text: "🎀 유연성을 기르는 기초 체육 훈련", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>세팅:</b> 나무젓가락 끝에 두루마리 휴지를 길게 붙여 우아한 리본을 만듭니다.</li><li>✅ <b>미션:</b> 선생님이 틀어주는 1분짜리 신나는 음악에 맞춰 모둠별 창작 안무를 선보입니다.</li><li>✅ <b>필수 요소:</b> 8자 그리기, 머리 위 나선형 그리기 동작이 반드시 1번 이상 포함되어야 합니다.</li><li>🚨 춤을 추다 텐션 조절 실패로 휴지 리본이 툭 끊어지면 심사위원 점수에서 크게 감점됩니다!</li></ul>" },
-            breaking: { animIcon: "🕺", bgIcon: "🎧", title: "브레이킹 (포즈 프리즈)", guideText: "음악이 멈추는 순간 흔들림 없이 정지하세요!", missionTitle: "스포츠 포즈 프리즈(Freeze)", bgColor: "from-yellow-500 to-orange-600", roles: [{ name: "비보이 🕺", color: "blue" }, { name: "DJ(음악) 🎧", color: "purple" }, { name: "탈락심사 👀", color: "slate" }], scoreLabel: "생존자 +1",
-                youtubeLinks: [ { text: "🕺 태권도/댄스 결합 퍼포먼스", url: ytBase+"iwPvibh6v2M" }, { text: "🎧 순발력을 요하는 얼음땡 체육", url: ytBase+"JxWAmJsMBR8" } ],
-                missionDesc: "<ul class='list-none space-y-3 text-sm md:text-lg font-medium'><li>✅ <b>진행:</b> K팝 음악이 교실에 쩌렁쩌렁 울리면 교실 중앙에서 신나게 막춤을 춥니다.</li><li>✅ <b>돌발 미션:</b> DJ가 음악을 멈추고 '양궁!', '수영!', '역도!' 등 종목 이름을 기습적으로 외칩니다.</li><li>✅ <b>규칙:</b> 외친 종목에 맞는 가장 역동적이고 멋진 포즈를 취하고 딱 3초간 멈춰야(Freeze) 합니다.</li><li>🏆 흔들리거나 친구 얼굴을 보고 웃음이 터지면 바로 아웃! 최후까지 살아남는 자가 승리합니다!</li></ul>" }
+            gymnastics: { animIcon: "🎀", bgIcon: "🎗️", title: "체조 (휴지 리본 댄스)", guideText: "리본이 꼬이지 않게 크게 원을 그리세요!", missionTitle: "휴지 리본 예술 체조", bgColor: "from-purple-600 to-pink-800", roles: [{ name: "체조선수 🎀", color: "pink" }, { name: "안무가 🎶", color: "purple" }, { name: "심사 💯", color: "yellow" }], scoreLabel: "예술점수 +1",
+                youtubeLinks: [ { text: "🥇 항저우 아시안게임 리듬체조 환상적 루틴", url: ytBase+"9c3c1nFMBvY" }, { text: "🎗️ 휴지와 나무젓가락으로 리본 체조 놀이", url: ytBase+"0kL9E3d8tDE" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>세팅:</b> 나무젓가락 끝에 두루마리 휴지를 1m 정도 길게 테이프로 붙여 만듭니다.</p><p>✅ <b>미션:</b> 선생님이 틀어주는 1분짜리 신나는 음악에 맞춰 창작 안무를 선보입니다.</p><p>✅ <b>필수 요소:</b> 8자 그리기, 나선형(소용돌이) 돌리기 동작이 꼭 1번씩 들어가야 합니다.</p><p>🚨 춤을 추다 휴지가 몸에 감기거나 바닥에 닿아 끊어지면 예술 점수가 깎입니다!</p></div>" },
+            breaking: { animIcon: "🕺", bgIcon: "🎧", title: "브레이킹 (포즈 프리즈)", guideText: "음악이 멈추면 흔들림 없이 정지하세요!", missionTitle: "스포츠 포즈 프리즈(Freeze)", bgColor: "from-yellow-500 to-orange-600", roles: [{ name: "비보이 🕺", color: "blue" }, { name: "DJ(음악) 🎧", color: "purple" }, { name: "탈락심사 👀", color: "slate" }], scoreLabel: "생존자 +1",
+                youtubeLinks: [ { text: "🥇 2024 파리 올림픽 화제의 브레이킹 배틀", url: ytBase+"1xO_P9T-w5s" }, { text: "🕺 교실 얼음땡! 신나는 프리즈 댄스 타임", url: ytBase+"2mK_Y1E-o9s" } ],
+                missionDesc: "<div class='space-y-3 text-sm sm:text-base md:text-lg font-medium leading-relaxed'><p>✅ <b>진행:</b> K팝 댄스 음악이 울리면 교실 중앙에서 신나게 리듬을 타며 막춤을 춥니다.</p><p>✅ <b>돌발 미션:</b> 선생님(DJ)이 음악을 멈추고 '양궁!', '역도!' 등 종목을 기습적으로 외칩니다.</p><p>✅ <b>규칙:</b> 외친 종목에 맞는 역동적인 포즈를 즉시 취하고 딱 3초간 얼음(Freeze)!</p><p>🏆 다리가 흔들리거나 웃음이 터지면 바로 탈락. 최후까지 살아남는 자가 승리합니다.</p></div>" }
         };
 
         let currentEvent = 'archery';
@@ -283,32 +284,33 @@
             currentEvent = document.getElementById('event-selector').value;
             const data = sportEvents[currentEvent];
 
-            // 1. 앞면 업데이트
+            // 1. 앞면 업데이트 (애니메이션 뷰어)
             document.getElementById('anim-icon').innerText = data.animIcon;
             document.getElementById('anim-title').innerText = data.title;
             document.getElementById('anim-guide').innerText = data.guideText;
             
-            // 2. 직접 재생되는 유튜브 영상 링크 2개 (오류 Zero 세팅)
+            // 2. 외부 재생을 보장하는 유튜브 직접 재생(watch?v=) 링크 동적 생성
             const linksContainer = document.getElementById('youtube-links-container');
             linksContainer.innerHTML = data.youtubeLinks.map(link => 
-                `<a href="${link.url}" target="_blank" class="flex items-center gap-3 bg-slate-700 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl transition-colors border border-slate-500 hover:border-red-400 shadow-md">
-                    <span class="text-2xl">▶️</span>
-                    <span class="truncate text-base md:text-lg">${link.text}</span>
+                `<a href="${link.url}" target="_blank" class="flex items-center gap-3 bg-slate-700 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl transition-colors border border-slate-500 hover:border-red-400 shadow-md w-full">
+                    <span class="text-2xl shrink-0">▶️</span>
+                    <span class="truncate text-sm sm:text-base md:text-lg w-full text-left">${link.text}</span>
                 </a>`
             ).join('');
             
-            // 3. 뒷면 상세 미션 업데이트
+            // 3. 뒷면 상세 미션 가이드 업데이트 (체크리스트 포맷 적용)
             document.getElementById('back-icon').innerText = data.bgIcon;
             document.getElementById('bg-icon-A').innerText = data.bgIcon;
             document.getElementById('bg-icon-B').innerText = data.bgIcon;
             
             document.getElementById('mission-title').innerText = data.missionTitle;
             document.getElementById('mission-desc').innerHTML = data.missionDesc; 
-            document.getElementById('mission-back').className = `back flex flex-col items-center justify-start text-center p-6 md:p-8 border-4 border-white bg-gradient-to-br ${data.bgColor} overflow-y-auto`;
+            document.getElementById('mission-back').className = `back flex flex-col items-center justify-start text-center p-4 md:p-8 border-4 border-white bg-gradient-to-br ${data.bgColor} overflow-y-auto`;
             
+            // 카드 항상 앞면으로 리셋
             document.getElementById('mission-card').classList.remove('flip');
 
-            // 4. 스코어보드 업데이트
+            // 4. 스코어보드 텍스트 업데이트
             const selectEl = document.getElementById('event-selector');
             const eventNameText = selectEl.options[selectEl.selectedIndex].text;
             const eventName = eventNameText.includes('(') ? eventNameText.split(' (')[0] : eventNameText; 
@@ -375,7 +377,7 @@
                 const chunk = Math.ceil(names.length / rolesData.length); resultBox.innerHTML = '';
                 rolesData.forEach((role, i) => {
                     const assigned = names.slice(i * chunk, (i+1) * chunk); const c = colorMap[role.color]; 
-                    resultBox.innerHTML += `<div class="${c.bg} border-2 ${c.border} p-6 rounded-xl flex flex-col items-center shadow-lg"><h3 class="text-2xl md:text-3xl font-black-han ${c.text} mb-4">${role.name}</h3><p class="text-xl md:text-2xl font-bold leading-relaxed text-center break-keep">${assigned.join(', ')}</p></div>`;
+                    resultBox.innerHTML += `<div class="${c.bg} border-2 ${c.border} p-4 md:p-6 rounded-xl flex flex-col items-center shadow-lg"><h3 class="text-xl md:text-3xl font-black-han ${c.text} mb-3 md:mb-4">${role.name}</h3><p class="text-sm md:text-2xl font-bold leading-relaxed text-center break-keep">${assigned.join(', ')}</p></div>`;
                 });
                 resultBox.classList.remove('hidden-tab'); resultBox.classList.remove('bounce-in'); void resultBox.offsetWidth; resultBox.classList.add('bounce-in');
                 confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 } });
