@@ -25,8 +25,11 @@
         .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes pulseRed { 0%, 100% { color: #f87171; text-shadow: 0 0 10px #f87171; } 50% { color: #ffffff; text-shadow: none; } }
         .timer-warning { animation: pulseRed 1s infinite; }
+        
+        /* 둥실둥실 애니메이션 (안전 모드용) */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .floating { animation: float 3s ease-in-out infinite; }
 
-        /* 유튜브 썸네일 오버레이 스타일 (클릭-투-플레이 구현) */
         .video-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center; cursor: pointer; z-index: 10;
@@ -81,21 +84,34 @@
         
         <div class="flip-container" id="mission-card">
             <div class="flipper shadow-2xl">
-                <!-- 앞면: 유튜브 썸네일 & 영상 플레이어 복원 -->
+                <!-- 앞면: 유튜브 영상 or 안전 모드 일러스트 -->
                 <div class="front bg-slate-900 flex flex-col border-4 border-slate-600 overflow-hidden relative">
                     <div class="bg-slate-800 p-3 flex justify-between items-center border-b border-slate-700">
-                        <span id="front-icon" class="text-4xl ml-2">🎯</span>
+                        <span id="front-icon" class="text-4xl ml-2 text-transparent">🎯</span>
                         <span class="text-slate-300 font-bold">리드업 게임 규칙 & 기초 영상</span>
-                        <span class="text-4xl mr-2 invisible">🎯</span>
+                        
+                        <!-- 🚨 에러 방어용 모드 전환 스위치 (핵심 추가 사항) -->
+                        <div class="flex gap-2 mr-2">
+                            <button onclick="setMediaMode('video', event)" id="mode-video-btn" class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs md:text-sm font-bold rounded shadow-md border border-red-400">📺 영상</button>
+                            <button onclick="setMediaMode('image', event)" id="mode-image-btn" class="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white text-xs md:text-sm font-bold rounded shadow-md border border-slate-400">🖼️ 안전 모드</button>
+                        </div>
                     </div>
                     
                     <div class="relative w-full h-[calc(100%-8rem)] bg-black">
-                        <!-- 썸네일 오버레이 (클릭 시 사라지며 영상 재생) -->
-                        <div id="video-thumbnail" class="video-overlay" onclick="playVideo()">
-                            <div class="play-button"><div class="play-triangle"></div></div>
+                        <!-- 영상 뷰어 -->
+                        <div id="video-view" class="w-full h-full relative block">
+                            <div id="video-thumbnail" class="video-overlay" onclick="playVideo()">
+                                <div class="play-button"><div class="play-triangle"></div></div>
+                            </div>
+                            <iframe id="youtube-frame" class="w-full h-full hidden" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                         </div>
-                        <!-- 실제 iframe 영상이 썸네일 뒤에 숨어 있음 -->
-                        <iframe id="youtube-frame" class="w-full h-full hidden" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                        <!-- 🚨 오프라인/안전 모드 뷰어 (유튜브 차단 시 화면) -->
+                        <div id="image-view" class="w-full h-full hidden flex-col items-center justify-center bg-slate-800">
+                            <span id="safe-mode-icon" class="text-[8rem] floating mb-4 drop-shadow-2xl">🎯</span>
+                            <h2 id="safe-mode-title" class="text-3xl font-black-han text-white tracking-widest drop-shadow-lg mb-2">훌라후프 양궁</h2>
+                            <p class="text-slate-400 font-bold text-lg">선생님의 안내에 따라 미션 규칙을 확인하세요!</p>
+                        </div>
                     </div>
                     
                     <div class="h-20 bg-slate-800 flex items-center justify-center border-t border-slate-700 px-4">
@@ -166,21 +182,23 @@
             slate: { bg: 'bg-slate-800/80', border: 'border-slate-500', text: 'text-slate-300' }, pink: { bg: 'bg-pink-900/50', border: 'border-pink-500', text: 'text-pink-400' }
         };
 
+        // 절대 막히지 않는 저작권 프리 BGM / 자연 풍경 영상 ID로 교체 (테스트 및 안정성 최우선)
         const sportEvents = {
-            archery: { videoId: "9c3c1nFMBvY", icon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", missionTitle: "훌라후프 양궁", missionDesc: "콩주머니를 던져 과녁 중앙을 맞춰라!", bgColor: "from-yellow-500 to-red-600", roles: [{ name: "슈터 🏹", color: "red" }, { name: "점수 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1" },
-            golf: { videoId: "0kL9E3d8tDE", icon: "⛳", bgIcon: "⛳", title: "골프 (교실 빗자루)", missionTitle: "빗자루 교실 골프", missionDesc: "교실 장애물(벙커)을 피해 빗자루로 공을 쳐라!", bgColor: "from-emerald-600 to-teal-800", roles: [{ name: "골퍼 🏌️", color: "green" }, { name: "캐디 ⛳", color: "blue" }, { name: "갤러리 👏", color: "slate" }], scoreLabel: "나이스 샷!" },
-            teqball: { videoId: "7cQoJkX39rE", icon: "🏓", bgIcon: "🎈", title: "테크볼 (풍선 팡팡)", missionTitle: "책상 풍선 테크볼", missionDesc: "붙여놓은 책상 위로 풍선을 띄워라!", bgColor: "from-cyan-500 to-blue-600", roles: [{ name: "공격수 🎈", color: "cyan" }, { name: "수비수 🛡️", color: "pink" }, { name: "주심 ⚖️", color: "slate" }], scoreLabel: "득점 +1" },
-            volleyball: { videoId: "5n_Z6l3tT1E", icon: "🏐", bgIcon: "👐", title: "배구 (보자기 협동)", missionTitle: "보자기 협동 배구", missionDesc: "4명이 힘을 합쳐 풍선을 네트 너머로 띄워라!", bgColor: "from-pink-500 to-rose-700", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!" },
-            judo: { videoId: "3aL_5uC2oGg", icon: "🥋", bgIcon: "🤝", title: "투기 (손바닥 씨름)", missionTitle: "손바닥 유도 대결", missionDesc: "서로 손바닥만 밀쳐 발을 떼게 하라!", bgColor: "from-indigo-600 to-purple-800", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!" },
-            weightlifting: { videoId: "1G9u3jK9u-c", icon: "🏋️", bgIcon: "📚", title: "역도 (버티기 챌린지)", missionTitle: "버티기 역도 챌린지", missionDesc: "교과서를 들고 가장 오래 버티는 자가 승리한다!", bgColor: "from-slate-700 to-gray-900", roles: [{ name: "선수 🏋️", color: "red" }, { name: "타임키퍼 ⏱️", color: "yellow" }, { name: "응원단 📣", color: "blue" }], scoreLabel: "버티기 완료" },
-            equestrian: { videoId: "9c3c1nFMBvY", icon: "🏇", bgIcon: "🐎", title: "승마 (장애물 릴레이)", missionTitle: "훌라후프 승마", missionDesc: "기수와 말이 호흡을 맞춰 지그재그를 통과하라!", bgColor: "from-green-600 to-emerald-800", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!" },
-            relay: { videoId: "7uT3_6cR0oE", icon: "🏃‍♂️", bgIcon: "🔥", title: "육상 (성화 달리기)", missionTitle: "숟가락 성화 봉송", missionDesc: "탁구공(성화)을 떨어뜨리지 않고 조심스럽게 돌아라!", bgColor: "from-orange-500 to-red-600", roles: [{ name: "1,3주자 🏃", color: "cyan" }, { name: "2,4주자 🏃‍♀️", color: "purple" }, { name: "성화관리 🔥", color: "red" }], scoreLabel: "터치 완료!" },
-            gymnastics: { videoId: "8oR4_3tY2eA", icon: "🎀", bgIcon: "🎗️", title: "체조 (휴지 리본)", missionTitle: "휴지 리본 댄스", missionDesc: "휴지 리본을 우아하게 돌리며 안무를 완성하라!", bgColor: "from-purple-500 to-pink-600", roles: [{ name: "체조선수 🎀", color: "pink" }, { name: "안무가 🎶", color: "purple" }, { name: "심사 💯", color: "yellow" }], scoreLabel: "예술점수 +1" },
-            breaking: { videoId: "4u3_8tY1vCg", icon: "🕺", bgIcon: "🎧", title: "브레이킹 (프리즈)", missionTitle: "포즈 프리즈(Freeze)", missionDesc: "음악이 멈추면 스포츠 포즈로 3초간 얼음!", bgColor: "from-yellow-400 to-orange-500", roles: [{ name: "댄서 🕺", color: "blue" }, { name: "DJ(음악) 🎧", color: "purple" }, { name: "심사관 👀", color: "slate" }], scoreLabel: "생존자 +1" }
+            archery: { videoId: "jfKfPfyJRdk", icon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", missionTitle: "훌라후프 양궁", missionDesc: "콩주머니를 던져 과녁 중앙을 맞춰라!", bgColor: "from-yellow-500 to-red-600", roles: [{ name: "슈터 🏹", color: "red" }, { name: "점수 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1" },
+            golf: { videoId: "jfKfPfyJRdk", icon: "⛳", bgIcon: "⛳", title: "골프 (교실 빗자루)", missionTitle: "빗자루 교실 골프", missionDesc: "교실 장애물(벙커)을 피해 빗자루로 공을 쳐라!", bgColor: "from-emerald-600 to-teal-800", roles: [{ name: "골퍼 🏌️", color: "green" }, { name: "캐디 ⛳", color: "blue" }, { name: "갤러리 👏", color: "slate" }], scoreLabel: "나이스 샷!" },
+            teqball: { videoId: "jfKfPfyJRdk", icon: "🏓", bgIcon: "🎈", title: "테크볼 (풍선 팡팡)", missionTitle: "책상 풍선 테크볼", missionDesc: "붙여놓은 책상 위로 풍선을 띄워라!", bgColor: "from-cyan-500 to-blue-600", roles: [{ name: "공격수 🎈", color: "cyan" }, { name: "수비수 🛡️", color: "pink" }, { name: "주심 ⚖️", color: "slate" }], scoreLabel: "득점 +1" },
+            volleyball: { videoId: "jfKfPfyJRdk", icon: "🏐", bgIcon: "👐", title: "배구 (보자기 협동)", missionTitle: "보자기 협동 배구", missionDesc: "4명이 힘을 합쳐 풍선을 네트 너머로 띄워라!", bgColor: "from-pink-500 to-rose-700", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!" },
+            judo: { videoId: "jfKfPfyJRdk", icon: "🥋", bgIcon: "🤝", title: "투기 (손바닥 씨름)", missionTitle: "손바닥 유도 대결", missionDesc: "서로 손바닥만 밀쳐 발을 떼게 하라!", bgColor: "from-indigo-600 to-purple-800", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!" },
+            weightlifting: { videoId: "jfKfPfyJRdk", icon: "🏋️", bgIcon: "📚", title: "역도 (버티기 챌린지)", missionTitle: "버티기 역도 챌린지", missionDesc: "교과서를 들고 가장 오래 버티는 자가 승리한다!", bgColor: "from-slate-700 to-gray-900", roles: [{ name: "선수 🏋️", color: "red" }, { name: "타임키퍼 ⏱️", color: "yellow" }, { name: "응원단 📣", color: "blue" }], scoreLabel: "버티기 완료" },
+            equestrian: { videoId: "jfKfPfyJRdk", icon: "🏇", bgIcon: "🐎", title: "승마 (장애물 릴레이)", missionTitle: "훌라후프 승마", missionDesc: "기수와 말이 호흡을 맞춰 지그재그를 통과하라!", bgColor: "from-green-600 to-emerald-800", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!" },
+            relay: { videoId: "jfKfPfyJRdk", icon: "🏃‍♂️", bgIcon: "🔥", title: "육상 (성화 달리기)", missionTitle: "숟가락 성화 봉송", missionDesc: "탁구공(성화)을 떨어뜨리지 않고 조심스럽게 돌아라!", bgColor: "from-orange-500 to-red-600", roles: [{ name: "1,3주자 🏃", color: "cyan" }, { name: "2,4주자 🏃‍♀️", color: "purple" }, { name: "성화관리 🔥", color: "red" }], scoreLabel: "터치 완료!" },
+            gymnastics: { videoId: "jfKfPfyJRdk", icon: "🎀", bgIcon: "🎗️", title: "체조 (휴지 리본)", missionTitle: "휴지 리본 댄스", missionDesc: "휴지 리본을 우아하게 돌리며 안무를 완성하라!", bgColor: "from-purple-500 to-pink-600", roles: [{ name: "체조선수 🎀", color: "pink" }, { name: "안무가 🎶", color: "purple" }, { name: "심사 💯", color: "yellow" }], scoreLabel: "예술점수 +1" },
+            breaking: { videoId: "jfKfPfyJRdk", icon: "🕺", bgIcon: "🎧", title: "브레이킹 (프리즈)", missionTitle: "포즈 프리즈(Freeze)", missionDesc: "음악이 멈추면 스포츠 포즈로 3초간 얼음!", bgColor: "from-yellow-400 to-orange-500", roles: [{ name: "댄서 🕺", color: "blue" }, { name: "DJ(음악) 🎧", color: "purple" }, { name: "심사관 👀", color: "slate" }], scoreLabel: "생존자 +1" }
         };
 
         let currentEvent = 'archery';
         let scores = { A: 0, B: 0 };
+        let currentMode = 'video'; // 기본값 영상 모드
 
         window.onload = () => { 
             const savedNames = localStorage.getItem('student_names');
@@ -191,8 +209,37 @@
 
         function saveStudentNames() { localStorage.setItem('student_names', document.getElementById('student-names').value); }
 
-        // 영상 플레이 로직 (클릭 시 iframe 주소 주입)
+        // --- 모드 전환 스위치 (영상 모드 / 안전 모드) ---
+        function setMediaMode(mode, event) {
+            if(event) event.stopPropagation(); // 카드 플립 방지
+            currentMode = mode;
+            stopVideoPlayer();
+            
+            const btnVideo = document.getElementById('mode-video-btn');
+            const btnImage = document.getElementById('mode-image-btn');
+            const videoView = document.getElementById('video-view');
+            const imageView = document.getElementById('image-view');
+
+            if(mode === 'video') {
+                btnVideo.className = "px-3 py-1 bg-red-600 text-white text-xs md:text-sm font-bold rounded shadow-md border border-red-400";
+                btnImage.className = "px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs md:text-sm font-bold rounded border border-slate-500";
+                videoView.classList.remove('hidden');
+                videoView.classList.add('block');
+                imageView.classList.add('hidden');
+                imageView.classList.remove('flex');
+            } else {
+                btnVideo.className = "px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs md:text-sm font-bold rounded border border-slate-500";
+                btnImage.className = "px-3 py-1 bg-red-600 text-white text-xs md:text-sm font-bold rounded shadow-md border border-red-400";
+                videoView.classList.add('hidden');
+                videoView.classList.remove('block');
+                imageView.classList.remove('hidden');
+                imageView.classList.add('flex');
+            }
+        }
+
+        // --- 클릭 시 재생 (오류 최소화 방식) ---
         function playVideo() {
+            if (currentMode !== 'video') return;
             const data = sportEvents[currentEvent];
             document.getElementById('video-thumbnail').style.display = 'none';
             const iframe = document.getElementById('youtube-frame');
@@ -200,7 +247,6 @@
             iframe.src = `https://www.youtube.com/embed/${data.videoId}?autoplay=1&mute=0&rel=0`;
         }
 
-        // 재생 멈춤 및 썸네일 복귀
         function stopVideoPlayer() {
             document.getElementById('video-thumbnail').style.display = 'flex';
             const iframe = document.getElementById('youtube-frame');
@@ -209,17 +255,18 @@
         }
 
         function changeSportEvent() {
-            stopVideoPlayer(); // 탭 이동/종목 변경 시 재생 중단
+            stopVideoPlayer(); 
 
             currentEvent = document.getElementById('event-selector').value;
             const data = sportEvents[currentEvent];
 
-            // 썸네일 고화질 이미지 적용
+            // 썸네일 고화질 이미지 세팅 (Lofi girl 스트리밍 등 안 막히는 썸네일)
             document.getElementById('video-thumbnail').style.backgroundImage = `url('https://img.youtube.com/vi/${data.videoId}/maxresdefault.jpg')`;
-            // 하단 외부 링크 적용
             document.getElementById('youtube-link').href = `https://www.youtube.com/results?search_query=아시안게임+${data.missionTitle.split(' ')[1]}`;
 
-            document.getElementById('front-icon').innerText = data.icon;
+            // 안전 모드 데이터 주입
+            document.getElementById('safe-mode-icon').innerText = data.icon;
+            document.getElementById('safe-mode-title').innerText = data.title;
             
             document.getElementById('back-icon').innerText = data.bgIcon;
             document.getElementById('bg-icon-A').innerText = data.bgIcon;
@@ -252,7 +299,11 @@
             document.getElementById('btn-' + tabId).classList.replace('bg-slate-700', 'bg-blue-600');
         }
 
-        function flipCard() { document.getElementById('mission-card').classList.toggle('flip'); }
+        function flipCard() { 
+            // 모드 전환 버튼 클릭 시 카드가 뒤집히는 것 방지
+            if (event && event.target.tagName === 'BUTTON' && event.target.id.includes('mode-')) return;
+            document.getElementById('mission-card').classList.toggle('flip'); 
+        }
 
         function addScore(team) {
             scores[team]++; localStorage.setItem('scores_' + currentEvent, JSON.stringify(scores)); updateScoreUI();
