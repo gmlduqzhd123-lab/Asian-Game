@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>엽쌤의 아시안게임 체육 수업 🏆</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #0f172a; color: white; touch-action: manipulation; overflow-x: hidden; }
+        .font-black-han { font-family: 'Black Han Sans', sans-serif; }
+        .hidden-tab { display: none !important; }
+
+        .flip-container { perspective: 1000px; width: 100%; max-width: 800px; height: 450px; margin: 0 auto; }
+        .flipper { transition: 0.8s; transform-style: preserve-3d; position: relative; width: 100%; height: 100%; }
+        .flip-container.flip .flipper { transform: rotateY(180deg); }
+        .front, .back { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 1.5rem; }
+        .front { z-index: 2; transform: rotateY(0deg); }
+        .back { transform: rotateY(180deg); }
+
+        @keyframes bounceIn { 0% { transform: scale(0.1); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes pulseRed { 0%, 100% { color: #f87171; text-shadow: 0 0 10px #f87171; } 50% { color: #ffffff; text-shadow: none; } }
+        .timer-warning { animation: pulseRed 1s infinite; }
+        
+        /* 둥실둥실 애니메이션 (오프라인 모드용) */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
+        .floating { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <nav class="bg-slate-800 p-4 shadow-lg z-10 flex flex-wrap justify-between items-center px-4 md:px-8 gap-4">
+        <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-center">
+            <span class="text-lg md:text-xl font-black-han text-yellow-400 whitespace-nowrap">🔥 오늘의 종목:</span>
+            <select id="event-selector" onchange="changeSportEvent()" class="bg-slate-700 text-white text-base md:text-xl font-bold p-2 rounded-lg border-2 border-slate-500 focus:border-yellow-400 outline-none w-full md:w-auto">
+                <optgroup label="표적/타겟형">
+                    <option value="archery" selected>1. 양궁 (훌라후프 과녁 던지기)</option>
+                    <option value="golf">2. 골프 (빗자루 교실 골프)</option>
+                </optgroup>
+                <optgroup label="네트/투기형">
+                    <option value="teqball">3. 테크볼 (책상 풍선 팡팡)</option>
+                    <option value="volleyball">4. 배구 (보자기 협동 배구)</option>
+                    <option value="judo">5. 투기 (안전 손바닥 밀치기)</option>
+                </optgroup>
+                <optgroup label="기록/도전형">
+                    <option value="weightlifting">6. 역도 (교과서 버티기 챌린지)</option>
+                    <option value="equestrian">7. 승마 (훌라후프 장애물 릴레이)</option>
+                    <option value="relay">8. 육상 (숟가락 성화 달리기)</option>
+                </optgroup>
+                <optgroup label="표현형">
+                    <option value="gymnastics">9. 체조 (휴지 리본 댄스)</option>
+                    <option value="breaking">10. 브레이킹 (종목 포즈 프리즈)</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="flex gap-2 md:gap-4 w-full md:w-auto justify-center">
+            <button onclick="switchTab('mission')" id="btn-mission" class="tab-btn px-4 md:px-6 py-2 rounded-lg font-bold text-sm md:text-xl bg-blue-600 hover:bg-blue-500 transition shadow">🎬 미션 룸</button>
+            <button onclick="switchTab('roulette')" id="btn-roulette" class="tab-btn px-4 md:px-6 py-2 rounded-lg font-bold text-sm md:text-xl bg-slate-700 hover:bg-slate-600 transition shadow">🎲 역할 뽑기</button>
+            <button onclick="switchTab('scoreboard')" id="btn-scoreboard" class="tab-btn px-4 md:px-6 py-2 rounded-lg font-bold text-sm md:text-xl bg-slate-700 hover:bg-slate-600 transition shadow">🎯 스코어보드</button>
+        </div>
+    </nav>
+
+    <!-- 1. 미션 룸 (오프라인 안전 모드 적용) -->
+    <section id="tab-mission" class="flex-1 p-4 md:p-6 flex flex-col items-center justify-center relative">
+        <h1 class="text-3xl md:text-4xl font-black-han text-yellow-400 mb-6 tracking-wider text-center">오늘의 스포츠 미션 알아보기!</h1>
+        
+        <div class="flip-container" id="mission-card">
+            <div class="flipper shadow-2xl">
+                <!-- 앞면: 영상 대신 일러스트와 텍스트로 대체 (유튜브 오류 완벽 차단) -->
+                <div class="front bg-slate-800 flex flex-col border-4 border-slate-600 overflow-hidden relative items-center justify-center">
+                    <span id="front-icon" class="text-[12rem] floating mb-8 drop-shadow-2xl">🎯</span>
+                    <h2 id="front-title" class="text-4xl md:text-5xl font-black-han text-white tracking-widest drop-shadow-lg">양궁 (훌라후프 과녁)</h2>
+                    <p class="text-slate-400 mt-4 text-xl">선생님의 설명을 잘 듣고 규칙을 확인하세요!</p>
+                </div>
+
+                <!-- 뒷면: 미션 -->
+                <div id="mission-back" class="back flex flex-col items-center justify-center text-center p-6 md:p-8 border-4 border-white bg-gradient-to-br from-blue-500 to-cyan-600">
+                    <span id="back-icon" class="text-8xl md:text-[10rem] mb-4 drop-shadow-2xl">🏹</span>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2">🔥 오늘의 체육 미션 🔥</h2>
+                    <h3 id="mission-title" class="text-5xl md:text-6xl font-black-han text-yellow-300 drop-shadow-md tracking-widest mt-2 mb-6">훌라후프 양궁</h3>
+                    <p id="mission-desc" class="text-xl md:text-3xl font-bold bg-black/50 p-5 rounded-2xl leading-relaxed text-white">콩주머니를 던져 과녁 중앙을 맞춰라! 역전 찬스를 노리자!</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="flipCard()" class="mt-8 px-10 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black-han text-2xl md:text-3xl rounded-full shadow-[0_6px_0_rgb(202,138,4)] active:translate-y-2 active:shadow-none transition-all">오늘의 변형 게임 미션 공개! 🚀</button>
+    </section>
+
+    <!-- 2. 역할 뽑기 룰렛 -->
+    <section id="tab-roulette" class="flex-1 hidden-tab p-4 md:p-8 flex flex-col items-center overflow-y-auto">
+        <h1 class="text-3xl md:text-4xl font-black-han text-green-400 mb-4 tracking-wider text-center">🎲 초간단 리드업 게임 역할 뽑기</h1>
+        <div class="w-full max-w-4xl bg-slate-800 p-4 md:p-6 rounded-2xl shadow-xl flex flex-col items-center shrink-0">
+            <textarea id="student-names" oninput="saveStudentNames()" rows="3" class="w-full p-4 rounded-lg bg-slate-700 text-white border-2 border-slate-600 focus:border-green-400 outline-none text-lg md:text-xl mb-6" placeholder="우리 반 학생들 이름을 쉼표로 구분하여 입력하세요..."></textarea>
+            <button onclick="startRoulette()" id="btn-start-roulette" class="w-full py-4 bg-green-500 hover:bg-green-400 text-black font-black-han text-2xl md:text-3xl rounded-xl shadow-lg transition transform hover:scale-105">역할 섞기 시작! 🌪️</button>
+        </div>
+        <div id="roulette-display" class="mt-8 text-4xl md:text-6xl font-black-han text-yellow-400 h-20 flex items-center justify-center text-center"></div>
+        <div id="roulette-result" class="mt-8 w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 hidden-tab pb-10"></div>
+    </section>
+
+    <!-- 3. 실시간 스코어보드 & 타이머 -->
+    <section id="tab-scoreboard" class="flex-1 hidden-tab flex flex-col relative pb-4">
+        <div class="w-full flex justify-between items-center px-4 md:px-8 py-4 absolute top-0 left-0 right-0 z-20">
+            <h1 id="scoreboard-title" class="text-2xl md:text-4xl font-black-han text-white drop-shadow-md bg-black/60 px-6 py-2 rounded-full border-2 border-slate-600">양궁 진행 중!</h1>
+            <button onclick="resetScores()" class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-500 rounded font-bold shadow text-sm md:text-lg">점수 초기화 🔄</button>
+        </div>
+        <div class="flex-1 flex flex-col md:flex-row w-full mt-16 md:mt-0">
+            <div class="flex-1 bg-blue-900 md:border-r-4 border-b-4 md:border-b-0 border-slate-900 flex flex-col items-center justify-center p-6 md:p-10 md:pt-24 relative overflow-hidden">
+                <span class="absolute text-[15rem] opacity-10 left-10 top-20 pointer-events-none" id="bg-icon-A">🏹</span>
+                <h2 class="text-4xl md:text-6xl font-black-han text-blue-300 mb-4 md:mb-8 z-10">청 군</h2>
+                <div id="scoreA" class="text-8xl md:text-[10rem] lg:text-[14rem] font-black-han leading-none text-white drop-shadow-[0_0_20px_rgba(59,130,246,0.8)] mb-6 md:mb-8 transition-all z-10">0</div>
+                <button onclick="addScore('A')" id="btn-score-A" class="z-10 w-11/12 md:w-4/5 h-20 md:h-32 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-2xl md:rounded-3xl text-3xl md:text-5xl font-black-han shadow-[0_8px_0_rgb(30,58,138)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
+            </div>
+            <div class="flex-1 bg-red-900 flex flex-col items-center justify-center p-6 md:p-10 md:pt-24 relative overflow-hidden">
+                <span class="absolute text-[15rem] opacity-10 right-10 top-20 pointer-events-none" id="bg-icon-B">🏹</span>
+                <h2 class="text-4xl md:text-6xl font-black-han text-red-300 mb-4 md:mb-8 z-10">백 군</h2>
+                <div id="scoreB" class="text-8xl md:text-[10rem] lg:text-[14rem] font-black-han leading-none text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.8)] mb-6 md:mb-8 transition-all z-10">0</div>
+                <button onclick="addScore('B')" id="btn-score-B" class="z-10 w-11/12 md:w-4/5 h-20 md:h-32 bg-red-600 hover:bg-red-500 active:bg-red-700 rounded-2xl md:rounded-3xl text-3xl md:text-5xl font-black-han shadow-[0_8px_0_rgb(127,29,29)] active:translate-y-2 active:shadow-none transition-all">명중 +1</button>
+            </div>
+        </div>
+        <div class="mt-4 mx-auto w-11/12 max-w-4xl bg-slate-800 p-4 rounded-2xl border-4 border-slate-600 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 z-30 shrink-0">
+            <span id="timer-display" class="text-5xl md:text-6xl font-black-han text-yellow-400 w-full md:w-40 text-center shrink-0">00:00</span>
+            <div class="grid grid-cols-3 gap-2 md:gap-4 w-full">
+                <button onclick="startCountdown(15)" class="py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-sm md:text-lg">15초 타이머</button>
+                <button onclick="startStopwatch()" class="py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-sm md:text-lg">기록 초시계</button>
+                <button onclick="stopTimer()" class="py-3 bg-red-600 hover:bg-red-500 rounded-lg font-bold text-sm md:text-lg">정지/리셋</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const colorMap = {
+            red: { bg: 'bg-red-900/50', border: 'border-red-500', text: 'text-red-400' }, blue: { bg: 'bg-blue-900/50', border: 'border-blue-500', text: 'text-blue-400' },
+            green: { bg: 'bg-green-900/50', border: 'border-green-500', text: 'text-green-400' }, yellow: { bg: 'bg-yellow-900/50', border: 'border-yellow-500', text: 'text-yellow-400' },
+            purple: { bg: 'bg-purple-900/50', border: 'border-purple-500', text: 'text-purple-400' }, cyan: { bg: 'bg-cyan-900/50', border: 'border-cyan-500', text: 'text-cyan-400' },
+            slate: { bg: 'bg-slate-800/80', border: 'border-slate-500', text: 'text-slate-300' }, pink: { bg: 'bg-pink-900/50', border: 'border-pink-500', text: 'text-pink-400' }
+        };
+
+        const sportEvents = {
+            archery: { icon: "🎯", bgIcon: "🏹", title: "양궁 (훌라후프)", missionTitle: "훌라후프 양궁", missionDesc: "콩주머니를 던져 과녁 중앙을 맞춰라!", bgColor: "from-yellow-500 to-red-600", roles: [{ name: "슈터 🏹", color: "red" }, { name: "점수 📋", color: "blue" }, { name: "과녁정리 🎯", color: "yellow" }], scoreLabel: "명중 +1" },
+            golf: { icon: "⛳", bgIcon: "⛳", title: "골프 (교실 빗자루)", missionTitle: "빗자루 교실 골프", missionDesc: "교실 장애물(벙커)을 피해 빗자루로 공을 쳐라!", bgColor: "from-emerald-600 to-teal-800", roles: [{ name: "골퍼 🏌️", color: "green" }, { name: "캐디 ⛳", color: "blue" }, { name: "갤러리 👏", color: "slate" }], scoreLabel: "나이스 샷!" },
+            teqball: { icon: "🏓", bgIcon: "🎈", title: "테크볼 (풍선 팡팡)", missionTitle: "책상 풍선 테크볼", missionDesc: "붙여놓은 책상 위로 풍선을 띄워라!", bgColor: "from-cyan-500 to-blue-600", roles: [{ name: "공격수 🎈", color: "cyan" }, { name: "수비수 🛡️", color: "pink" }, { name: "주심 ⚖️", color: "slate" }], scoreLabel: "득점 +1" },
+            volleyball: { icon: "🏐", bgIcon: "👐", title: "배구 (보자기 협동)", missionTitle: "보자기 협동 배구", missionDesc: "4명이 힘을 합쳐 풍선을 네트 너머로 띄워라!", bgColor: "from-pink-500 to-rose-700", roles: [{ name: "서버 🏐", color: "blue" }, { name: "리시버 👐", color: "green" }, { name: "선심 🚩", color: "pink" }], scoreLabel: "스파이크!" },
+            judo: { icon: "🥋", bgIcon: "🤝", title: "투기 (손바닥 씨름)", missionTitle: "손바닥 유도 대결", missionDesc: "서로 손바닥만 밀쳐 발을 떼게 하라!", bgColor: "from-indigo-600 to-purple-800", roles: [{ name: "청코너 🟦", color: "blue" }, { name: "홍코너 🟥", color: "red" }, { name: "주심 🥋", color: "yellow" }], scoreLabel: "한판 승!" },
+            weightlifting: { icon: "🏋️", bgIcon: "📚", title: "역도 (버티기 챌린지)", missionTitle: "버티기 역도 챌린지", missionDesc: "교과서를 들고 가장 오래 버티는 자가 승리한다!", bgColor: "from-slate-700 to-gray-900", roles: [{ name: "선수 🏋️", color: "red" }, { name: "타임키퍼 ⏱️", color: "yellow" }, { name: "응원단 📣", color: "blue" }], scoreLabel: "버티기 완료" },
+            equestrian: { icon: "🏇", bgIcon: "🐎", title: "승마 (장애물 릴레이)", missionTitle: "훌라후프 승마", missionDesc: "기수와 말이 호흡을 맞춰 지그재그를 통과하라!", bgColor: "from-green-600 to-emerald-800", roles: [{ name: "기수 🏇", color: "blue" }, { name: "말 🐴", color: "slate" }, { name: "관리 🚧", color: "green" }], scoreLabel: "완주 성공!" },
+            relay: { icon: "🏃‍♂️", bgIcon: "🔥", title: "육상 (성화 달리기)", missionTitle: "숟가락 성화 봉송", missionDesc: "탁구공(성화)을 떨어뜨리지 않고 조심스럽게 돌아라!", bgColor: "from-orange-500 to-red-600", roles: [{ name: "1,3주자 🏃", color: "cyan" }, { name: "2,4주자 🏃‍♀️", color: "purple" }, { name: "성화관리 🔥", color: "red" }], scoreLabel: "터치 완료!" },
+            gymnastics: { icon: "🎀", bgIcon: "🎗️", title: "체조 (휴지 리본)", missionTitle: "휴지 리본 댄스", missionDesc: "휴지 리본을 우아하게 돌리며 안무를 완성하라!", bgColor: "from-purple-500 to-pink-600", roles: [{ name: "체조선수 🎀", color: "pink" }, { name: "안무가 🎶", color: "purple" }, { name: "심사 💯", color: "yellow" }], scoreLabel: "예술점수 +1" },
+            breaking: { icon: "🕺", bgIcon: "🎧", title: "브레이킹 (프리즈)", missionTitle: "포즈 프리즈(Freeze)", missionDesc: "음악이 멈추면 스포츠 포즈로 3초간 얼음!", bgColor: "from-yellow-400 to-orange-500", roles: [{ name: "댄서 🕺", color: "blue" }, { name: "DJ(음악) 🎧", color: "purple" }, { name: "심사관 👀", color: "slate" }], scoreLabel: "생존자 +1" }
+        };
+
+        let currentEvent = 'archery';
+        let scores = { A: 0, B: 0 };
+
+        window.onload = () => { 
+            const savedNames = localStorage.getItem('student_names');
+            if (savedNames) document.getElementById('student-names').value = savedNames;
+            else document.getElementById('student-names').value = "김유신, 이순신, 강감찬, 장보고, 홍길동, 유관순, 신사임당, 안중근, 윤봉길, 김구, 이이, 이황";
+            changeSportEvent(); 
+        };
+
+        function saveStudentNames() { localStorage.setItem('student_names', document.getElementById('student-names').value); }
+
+        function changeSportEvent() {
+            currentEvent = document.getElementById('event-selector').value;
+            const data = sportEvents[currentEvent];
+
+            // 미션 룸 오프라인 렌더링 업데이트
+            document.getElementById('front-icon').innerText = data.icon;
+            document.getElementById('front-title').innerText = data.title;
+            
+            document.getElementById('back-icon').innerText = data.bgIcon;
+            document.getElementById('bg-icon-A').innerText = data.bgIcon;
+            document.getElementById('bg-icon-B').innerText = data.bgIcon;
+            
+            document.getElementById('mission-title').innerText = data.missionTitle;
+            document.getElementById('mission-desc').innerText = data.missionDesc;
+            document.getElementById('mission-back').className = `back flex flex-col items-center justify-center text-center p-6 md:p-8 border-4 border-white bg-gradient-to-br ${data.bgColor}`;
+            document.getElementById('mission-card').classList.remove('flip');
+
+            const selectEl = document.getElementById('event-selector');
+            const eventName = selectEl.options[selectEl.selectedIndex].text.split('. ')[1];
+            document.getElementById('scoreboard-title').innerText = `🔥 ${eventName} 진행 중!`;
+            document.getElementById('btn-score-A').innerText = data.scoreLabel;
+            document.getElementById('btn-score-B').innerText = data.scoreLabel;
+            
+            document.getElementById('roulette-result').classList.add('hidden-tab');
+            document.getElementById('btn-start-roulette').innerText = "역할 섞기 시작! 🌪️";
+
+            const savedScores = localStorage.getItem('scores_' + currentEvent);
+            scores = savedScores ? JSON.parse(savedScores) : { A: 0, B: 0 };
+            updateScoreUI();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-tab'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden-tab');
+            document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('bg-blue-600'); btn.classList.add('bg-slate-700'); });
+            document.getElementById('btn-' + tabId).classList.replace('bg-slate-700', 'bg-blue-600');
+        }
+
+        function flipCard() { document.getElementById('mission-card').classList.toggle('flip'); }
+
+        function addScore(team) {
+            scores[team]++; localStorage.setItem('scores_' + currentEvent, JSON.stringify(scores)); updateScoreUI();
+            const colors = team === 'A' ? ['#3b82f6', '#ffffff'] : ['#ef4444', '#ffffff'];
+            confetti({ particleCount: 100, spread: 80, origin: { x: team === 'A' ? 0.25 : 0.75, y: 0.8 }, colors: colors, zIndex: 100 });
+        }
+
+        function resetScores() {
+            if(confirm("이 종목의 점수를 0점으로 초기화하시겠습니까?")) {
+                scores = { A: 0, B: 0 }; localStorage.setItem('scores_' + currentEvent, JSON.stringify(scores)); updateScoreUI();
+            }
+        }
+
+        function updateScoreUI() { document.getElementById('scoreA').innerText = scores.A; document.getElementById('scoreB').innerText = scores.B; }
+
+        let rouletteInterval;
+        function startRoulette() {
+            let names = document.getElementById('student-names').value.split(',').map(n => n.trim()).filter(n => n.length > 0);
+            const rolesData = sportEvents[currentEvent].roles;
+            if(names.length < rolesData.length) return alert(`최소 ${rolesData.length}명의 학생 이름이 필요합니다.`);
+
+            const display = document.getElementById('roulette-display');
+            const resultBox = document.getElementById('roulette-result');
+            const btn = document.getElementById('btn-start-roulette');
+            
+            resultBox.classList.add('hidden-tab'); btn.disabled = true; btn.classList.add('opacity-50');
+
+            let counter = 0; display.style.display = 'flex';
+            rouletteInterval = setInterval(() => { display.innerText = names[Math.floor(Math.random() * names.length)] + " ???"; }, 50);
+
+            setTimeout(() => {
+                clearInterval(rouletteInterval); display.style.display = 'none';
+                for (let i = names.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [names[i], names[j]] = [names[j], names[i]]; }
+                const chunk = Math.ceil(names.length / rolesData.length); resultBox.innerHTML = '';
+                rolesData.forEach((role, i) => {
+                    const assigned = names.slice(i * chunk, (i+1) * chunk); const c = colorMap[role.color]; 
+                    resultBox.innerHTML += `<div class="${c.bg} border-2 ${c.border} p-6 rounded-xl flex flex-col items-center shadow-lg"><h3 class="text-2xl md:text-3xl font-black-han ${c.text} mb-4">${role.name}</h3><p class="text-xl md:text-2xl font-bold leading-relaxed text-center break-keep">${assigned.join(', ')}</p></div>`;
+                });
+                resultBox.classList.remove('hidden-tab'); resultBox.classList.remove('bounce-in'); void resultBox.offsetWidth; resultBox.classList.add('bounce-in');
+                confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 } });
+                btn.disabled = false; btn.classList.remove('opacity-50'); btn.innerText = "역할 다시 섞기 🌪️";
+            }, 2000);
+        }
+
+        let timerInterval; let timeCurrent = 0; let isCountdown = false;
+        const timerDisplay = document.getElementById('timer-display');
+
+        function updateTimerUI(seconds) {
+            timerDisplay.innerText = `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+            if(isCountdown && seconds <= 5 && seconds > 0) timerDisplay.classList.add('timer-warning');
+            else timerDisplay.classList.remove('timer-warning');
+        }
+
+        function startCountdown(sec) {
+            clearInterval(timerInterval); timeCurrent = sec; isCountdown = true; updateTimerUI(timeCurrent);
+            timerInterval = setInterval(() => {
+                timeCurrent--; updateTimerUI(timeCurrent);
+                if(timeCurrent <= 0) { clearInterval(timerInterval); timerDisplay.innerText = "TIME OUT!"; timerDisplay.classList.remove('timer-warning'); confetti({ particleCount: 50, spread: 60, origin: { y: 0.9 }, colors: ['#ff0000'] }); }
+            }, 1000);
+        }
+
+        function startStopwatch() {
+            clearInterval(timerInterval); timeCurrent = 0; isCountdown = false; updateTimerUI(timeCurrent);
+            timerInterval = setInterval(() => { timeCurrent++; updateTimerUI(timeCurrent); }, 1000);
+        }
+
+        function stopTimer() { clearInterval(timerInterval); timerDisplay.innerText = "00:00"; timerDisplay.classList.remove('timer-warning'); }
+    </script>
+</body>
+</html>
