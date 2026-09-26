@@ -1,0 +1,12 @@
+{
+  "name": "asian-game-pe",
+  "private": true,
+  "description": "아시안게임 체육 수업 웹앱 - 인터넷 없이도 동작하도록 Tailwind CSS를 index.html에 내장합니다.",
+  "scripts": {
+    "build:css": "node scripts/build-css.mjs"
+  },
+  "devDependencies": {
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.19"
+  }
+}
