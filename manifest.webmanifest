@@ -1,0 +1,17 @@
+{
+  "name": "엽쌤의 아시안게임 체육 수업",
+  "short_name": "아시안게임 체육",
+  "description": "아시안게임 종목을 교실·강당용 리드업 게임으로 즐기는 체육 수업",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFF8F1",
+  "theme_color": "#FFF8F1",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
