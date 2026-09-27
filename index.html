@@ -206,7 +206,7 @@
     <!-- 상단 네비게이션 -->
     <nav class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#EDE4F3] px-3 md:px-5 py-2.5 flex flex-col gap-2.5" aria-label="상단 메뉴">
         <div class="flex items-center gap-2 w-full">
-            <button onclick="goHome()" class="icon-btn" title="처음으로" aria-label="처음으로">🏠</button>
+            <button onclick="goHome()" class="btn btn-ghost text-sm px-3 shrink-0" title="첫 화면 (종목 고르기)" aria-label="첫 화면으로 (종목 고르기)">🏠<span class="hidden md:inline">첫 화면</span></button>
             <div class="hidden lg:flex items-center gap-2 shrink-0 mr-1">
                 <span class="font-display text-2xl leading-none">엽쌤 <span style="color:var(--coral)">아시안게임</span> 체육</span>
             </div>
@@ -229,6 +229,13 @@
     <div id="menu" class="hidden-tab card p-2" role="menu" aria-label="선생님 메뉴"></div>
 
     <main id="main" class="flex-1 flex flex-col pb-28" tabindex="-1">
+
+        <!-- 🏠 첫 화면: 앱을 열 때마다 여기서 오늘의 종목을 골라요 -->
+        <section id="tab-home" class="hidden-tab flex-1 p-4 md:p-8 flex flex-col items-center" aria-labelledby="h-home">
+            <h1 id="h-home" class="section-title"><span class="sticker" style="background:#FFE3EA">🏅</span>오늘은 어떤 종목을 할까요?</h1>
+            <p class="section-sub mb-5">종목 카드를 누르면 바로 수업이 시작돼요!</p>
+            <div id="home-body" class="w-full max-w-6xl flex flex-col gap-6"></div>
+        </section>
 
         <!-- ① 준비운동 -->
         <section id="tab-warmup" class="hidden-tab flex-1 p-4 md:p-8 flex flex-col items-center" aria-labelledby="h-warmup">
@@ -1166,8 +1173,30 @@
             b.classList.remove('hidden-tab'); b.textContent = `다음: ${STEPS[i + 1].icon} ${STEPS[i + 1].label} →`;
         }
         function goNextStep() { const i = STEPS.findIndex(s => s.tab === currentTab); if (i >= 0 && i < STEPS.length - 1) { switchTab(STEPS[i + 1].tab); window.scrollTo({ top: 0 }); } }
-        function goPrevStep() { const i = STEPS.findIndex(s => s.tab === currentTab); if (i > 0) { switchTab(STEPS[i - 1].tab); window.scrollTo({ top: 0 }); } else if (currentTab === 'quiz') switchTab('reflect'); }
-        function goHome() { switchTab('mission'); window.scrollTo({ top: 0 }); }
+        function goPrevStep() { const i = STEPS.findIndex(s => s.tab === currentTab); if (i > 0) { switchTab(STEPS[i - 1].tab); window.scrollTo({ top: 0 }); } else if (currentTab === 'quiz') switchTab('reflect'); else if (i === 0) goHome(); }
+        function goHome() { closeSlides(); closeModal(); switchTab('home'); window.scrollTo({ top: 0 }); }
+
+        // ---------- 🏠 첫 화면: 종목 카드를 누르면 바로 그 종목 수업으로 ----------
+        function chooseEvent(k) {
+            if (!allEvents()[k]) return;
+            changeSportEvent(k); switchTab('mission'); window.scrollTo({ top: 0 });
+            const e = ev(); toast(`${e.icon} ${e.name} 수업을 시작해요!`); speak(`${e.name} 수업을 시작해요!`);
+        }
+        function renderHome() {
+            const all = allEvents(), vis = visibleKeys(), cur = ev();
+            const grid = keys => `<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">${keys.map(k => eventCard(k, normalizeEvent(all[k]), `chooseEvent('${esc(k)}')`, false)).join('')}</div>`;
+            const rec = RECOMMENDED.filter(k => all[k] && vis.includes(k));
+            const groups = Object.entries(GROUPS).map(([g, label]) => [label, vis.filter(k => (GROUPS[all[k].group] ? all[k].group : 'custom') === g)]).filter(([, ks]) => ks.length);
+            $('home-body').innerHTML = `
+                <div class="card p-4 md:p-5 flex flex-wrap items-center gap-2 justify-center">
+                    <button onclick="chooseEvent('${esc(cur.key)}')" class="btn btn-ink font-display text-lg md:text-xl px-6">▶ 지난번 종목 이어서: ${esc(cur.icon)} ${esc(cur.name)}</button>
+                    <button onclick="openQuickStart(1)" class="btn btn-ghost teacher-only">🚀 빠른 시작 (반·팀까지 설정)</button>
+                    <button onclick="openPicker()" class="btn btn-ghost">🔍 조건으로 찾기</button>
+                </div>
+                ${rec.length ? `<div><h2 class="font-display text-2xl md:text-3xl mb-3">⭐ 추천 종목 <span class="text-base font-sans font-bold muted">준비물이 간단하고 교실·강당에서 바로 할 수 있어요</span></h2>${grid(rec)}</div>` : ''}
+                <div><h2 class="font-display text-2xl md:text-3xl mb-3">📚 모든 종목</h2>
+                    <div class="flex flex-col gap-5">${groups.map(([label, ks]) => `<div><h3 class="font-display text-xl ink2 mb-2">${esc(label.replace(/^\d+\.\s*/, ''))}</h3>${grid(ks)}</div>`).join('')}</div></div>`;
+        }
 
         let lessonStart = null, lessonTick = null;
         function stepMinutes() { const f = (db.lessonLen || 40) / 40; return STEPS.map(s => Math.max(1, Math.round(s.min * f))); }
@@ -1249,7 +1278,7 @@
             if (quiz.src === 'event') quiz.pool = [];
             renderAll();
         }
-        function renderAll() { renderMission(); renderWarmup(); renderClassBar(); renderRoster(); renderGame(); renderAward(); renderReflect(); if (currentTab === 'quiz') { if (quiz.src === 'event' && !quiz.pool.length) quizReset(); else renderQuiz(); } }
+        function renderAll() { renderHome(); renderMission(); renderWarmup(); renderClassBar(); renderRoster(); renderGame(); renderAward(); renderReflect(); if (currentTab === 'quiz') { if (quiz.src === 'event' && !quiz.pool.length) quizReset(); else renderQuiz(); } }
 
         // ---------- ① 준비운동 ----------
         let wu = { idx: -1, iv: null, end: 0, remain: 0, last: null };
@@ -1974,7 +2003,8 @@
                 <div class="flex flex-wrap gap-2 mt-6">${step > 1 ? `<button onclick="qs.keep=true; openQuickStart(${step - 1})" class="btn btn-ghost">← 이전</button>` : `<button onclick="db.onboarded=true; save(); closeModal()" class="btn btn-ghost">건너뛰기</button>`}<span class="flex-1"></span>
                 ${step < 3 ? `<button onclick="qs.keep=true; openQuickStart(${step + 1})" class="btn btn-ink font-display text-lg px-6">다음 →</button>` : `<button onclick="qsFinish()" class="btn btn-coral font-display text-xl px-7">🚀 수업 시작!</button>`}</div>`);
         }
-        function qsPick(k) { qs.eventKey = k; qs.keep = true; openQuickStart(1); }
+        // 종목 카드를 누르면 바로 다음 단계(반 명단)로 넘어가요
+        function qsPick(k) { qs.eventKey = k; qs.keep = true; SFX.tick(); openQuickStart(2); }
         async function qsNewClass() { await addClass(); openQuickStart(2); }
         function qsFinish() {
             const teamsChangedNow = qs.teams !== db.teams.length || qs.preset !== db.teamPreset;
@@ -2256,6 +2286,7 @@
 
         // ---------- ⌨️ 키보드 · 발표용 리모컨 ----------
         function remoteNext() {
+            if (currentTab === 'home') return chooseEvent(db.eventKey);
             if (currentTab === 'warmup') { if (wu.idx < 0) return wuToggle(); if (wu.idx < wuList().length) return wuSkip(); return goNextStep(); }
             if (currentTab === 'quiz') { if (!quiz.revealed) return quizAnswer(null); return quizNext(); }
             goNextStep();
@@ -2297,8 +2328,8 @@
 
         // ---------- 시작 ----------
         applyScale(); renderTabs(); renderSelector(); save();
-        renderAll(); switchTab('mission');
-        if (!db.onboarded) setTimeout(() => openQuickStart(1), 400);
+        // 앱을 열 때마다 항상 첫 화면(종목 고르기)에서 시작해요
+        renderAll(); switchTab('home');
     </script>
 </body>
 </html>
