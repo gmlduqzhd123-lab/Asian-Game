@@ -114,6 +114,7 @@
         .tab-btn .num { display: inline-flex; width: 1.4rem; height: 1.4rem; border-radius: 999px; align-items: center; justify-content: center; font-size: .75rem; background: #EFE6FA; color: var(--grape-d); }
         .tab-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 6px 16px -8px rgba(46,42,71,.6); }
         .tab-btn.active .num { background: var(--lemon); color: var(--ink); }
+        #tabs { padding: 5px; margin: -5px; scroll-padding-inline: 5px; }
         .tab-btn.now { outline: 3px solid rgba(11,132,120,.5); outline-offset: 1px; }
         .tab-btn.now::after { content: ''; width: .55rem; height: .55rem; border-radius: 999px; background: var(--mint); }
 
@@ -218,6 +219,7 @@
             </div>
             <div class="flex-1 hidden md:block"></div>
             <span class="hide-phone teacher-only shrink-0"><button id="lesson-chip" onclick="toggleLesson()" class="btn btn-mint text-sm py-2 px-4 tabular-nums" title="수업 흐름 타이머">▶ 수업 시작</button></span>
+            <button id="btn-end-lesson" onclick="endLesson()" class="btn btn-coral text-sm px-3 teacher-only shrink-0 hidden-tab" title="수업 끝내기" aria-label="수업 끝내기">🏁<span class="hidden sm:inline">수업 끝</span></button>
             <button onclick="togglePresent()" class="btn btn-ghost text-sm px-3 teacher-only shrink-0 hide-phone" title="학생에게 보여 줄 화면 (선생님 버튼 숨김)" aria-label="학생 화면 모드 켜기">👀<span class="hidden md:inline">학생 화면</span></button>
             <button onclick="togglePresent()" class="btn btn-coral text-sm px-3 present-only shrink-0" aria-label="학생 화면 모드 끄기">✕<span class="hidden sm:inline">학생 화면 끝</span></button>
             <button id="btn-menu" onclick="toggleMenu()" class="btn btn-ink text-sm px-3.5 teacher-only shrink-0" aria-haspopup="true" aria-expanded="false" aria-controls="menu">☰<span class="hidden sm:inline">메뉴</span></button>
@@ -1343,10 +1345,11 @@
         }
         function updateNextBtn() {
             const i = STEPS.findIndex(s => s.tab === currentTab), b = $('btn-next');
-            if (i < 0 || i >= STEPS.length - 1) { b.classList.add('hidden-tab'); return; }
-            b.classList.remove('hidden-tab'); b.textContent = `다음: ${STEPS[i + 1].icon} ${STEPS[i + 1].label} →`;
+            if (i < 0) { b.classList.add('hidden-tab'); return; }
+            b.classList.remove('hidden-tab');
+            b.textContent = i >= STEPS.length - 1 ? '🏁 수업 끝내기' : `다음: ${STEPS[i + 1].icon} ${STEPS[i + 1].label} →`;
         }
-        function goNextStep() { const i = STEPS.findIndex(s => s.tab === currentTab); if (i >= 0 && i < STEPS.length - 1) { switchTab(STEPS[i + 1].tab); window.scrollTo({ top: 0 }); } }
+        function goNextStep() { const i = STEPS.findIndex(s => s.tab === currentTab); if (i === STEPS.length - 1) return endLesson(); if (i >= 0 && i < STEPS.length - 1) { switchTab(STEPS[i + 1].tab); window.scrollTo({ top: 0 }); } }
         function goPrevStep() { const i = STEPS.findIndex(s => s.tab === currentTab); if (i > 0) { switchTab(STEPS[i - 1].tab); window.scrollTo({ top: 0 }); } else if (currentTab === 'quiz') switchTab('reflect'); else if (i === 0) goHome(); }
         function goHome() { closeSlides(); closeModal(); switchTab('home'); window.scrollTo({ top: 0 }); }
 
@@ -1385,9 +1388,36 @@
             lessonStart = Date.now(); clearInterval(lessonTick); lessonTick = setInterval(renderLesson, 1000); renderLesson();
             switchTab('warmup'); SFX.whistle(.5); toast(`${db.lessonLen}분 수업을 시작해요! 초록 점이 지금 할 단계예요.`);
         }
+        // 🏁 수업 끝내기: 타이머를 모두 멈추고 오늘 수업을 정리해요
+        async function endLesson() {
+            closeMenu();
+            if (!await ask('오늘 수업을 마칠까요?\n수업 흐름·경기·준비운동 타이머가 모두 멈춰요. 점수와 기록은 그대로 남아요.', { title: '🏁 수업 끝내기', ok: '🏁 수업 끝내기' })) return;
+            const sec = lessonStart ? Math.floor((Date.now() - lessonStart) / 1000) : 0;
+            const today = new Date().toDateString(), c = cdata();
+            const games = c.history.filter(h => new Date(h.date).toDateString() === today);
+            lessonStart = null; clearInterval(lessonTick); renderLesson();
+            stopTimer(); stopRace(); wuReset();
+            SFX.whistle(.8); fireConfetti({ particleCount: 140, spread: 110 }); speak('오늘 수업 끝! 모두 수고했어요!');
+            const e = ev();
+            openModal(`<div class="text-center">
+                <div class="text-6xl mb-2" aria-hidden="true">🏁</div>
+                <h2 class="font-display text-3xl md:text-4xl mb-1">오늘 수업 끝! 모두 수고했어요 👏</h2>
+                <p class="muted font-semibold mb-5">${esc(cls().name)} · ${esc(e.icon)} ${esc(e.name)}</p>
+                <div class="grid grid-cols-2 gap-3 max-w-md mx-auto mb-5">
+                    <div class="card p-4"><div class="text-sm muted font-bold">수업 시간</div><div class="font-display text-3xl tabular-nums">${sec ? fmtSec(sec) : '-'}</div></div>
+                    <div class="card p-4"><div class="text-sm muted font-bold">오늘 끝낸 경기</div><div class="font-display text-3xl">${games.length}경기</div></div>
+                </div>
+                ${games.length ? `<ul class="text-left max-w-md mx-auto mb-5 space-y-1.5 font-semibold">${games.slice(-5).map(h => { const w = h.results.filter(r => r.rank === 1).map(r => r.team); return `<li class="soft rounded-2xl px-3 py-2">${esc(h.icon || '')} ${esc(h.eventName || '')} · 🥇 ${esc(w.join(', ') || '-')}</li>`; }).join('')}</ul>` : ''}
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button onclick="closeModal(); goHome()" class="btn btn-ink font-display text-lg px-6">🏠 첫 화면으로</button>
+                    ${cls().names ? '<button onclick="closeModal(); endOfClassCleanup()" class="btn btn-ghost">🧹 명단 지우기 (공용 컴퓨터)</button>' : ''}
+                    <button onclick="closeModal()" class="btn btn-ghost">닫기</button>
+                </div></div>`);
+        }
         function renderLesson() {
             const chip = $('lesson-chip');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('now'));
+            $('btn-end-lesson').classList.toggle('hidden-tab', !lessonStart);
             if (!lessonStart) { chip.textContent = '▶ 수업 시작'; chip.classList.replace('btn-coral', 'btn-mint'); return; }
             const sec = Math.floor((Date.now() - lessonStart) / 1000), mins = stepMinutes();
             let acc = 0, idx = STEPS.length - 1;
@@ -1417,6 +1447,7 @@
             const items = [
                 ['🚀', '빠른 시작 (종목·반·팀 3단계)', 'openQuickStart()'],
                 ['⏱️', lessonStart ? '수업 흐름 타이머 멈추기' : '수업 흐름 타이머 시작', 'toggleLesson()'],
+                ['🏁', '수업 끝내기', 'endLesson()'],
                 ['👀', '학생 화면으로 보기', 'togglePresent()'],
                 ['🔠', '글씨 크기', 'cycleFont()', fontLabel()],
                 ['🔊', '효과음', 'toggleSound()', db.sound ? '켜짐' : '꺼짐'],
