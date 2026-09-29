@@ -1053,7 +1053,10 @@
         const $ = id => document.getElementById(id);
         const store = {
             get(key) { try { return localStorage.getItem(key); } catch (e) { return null; } },
-            set(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+            set(key, value) {
+                try { localStorage.setItem(key, value); }
+                catch (e) { if (!store.warned && /quota/i.test(e && e.name || '')) { store.warned = true; setTimeout(() => toast('⚠️ 저장 공간이 가득 찼어요. ⚙️ 설정 → 백업으로 기록을 내보내고 지난 기록을 정리해 주세요.'), 0); } }
+            }
         };
         const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
         const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
