@@ -285,9 +285,9 @@
     <!-- 상단 네비게이션 -->
     <nav class="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#EDE4F3] px-3 md:px-5 py-2.5 flex flex-col gap-2.5" aria-label="상단 메뉴">
         <div class="flex items-center gap-2 w-full">
-            <button onclick="goHome()" class="btn btn-ghost text-sm px-3 shrink-0" title="첫 화면 (종목 고르기)" aria-label="첫 화면으로 (종목 고르기)">🏠<span class="hidden md:inline">첫 화면</span></button>
+            <button onclick="openLanding()" class="btn btn-ghost text-sm px-3 shrink-0" title="첫 화면 (시작 화면)" aria-label="첫 화면(시작 화면)으로">🏠<span class="hidden md:inline">첫 화면</span></button>
             <div class="hidden xl:flex items-center gap-2 shrink-0 mr-1">
-                <span class="font-display text-2xl leading-none">엽쌤 <span style="color:var(--coral)">아시안게임</span> 체육</span>
+                <button onclick="openLanding()" class="font-display text-2xl leading-none" title="시작 화면으로">엽쌤 <span style="color:var(--coral)">아시안게임</span> 체육</button>
             </div>
             <div class="flex items-center gap-1.5 flex-1 min-w-0 md:min-w-[15rem] max-w-md bg-white border-[1.5px] border-[#DDD2EA] rounded-full pl-2 sm:pl-3 pr-1 py-1 shadow-sm">
                 <span class="text-lg shrink-0 hidden sm:inline" aria-hidden="true">🔥</span>
@@ -1477,7 +1477,7 @@
                 <div class="flex flex-wrap gap-2"><button onclick="closeModal(); openQuickStart(1)" class="btn btn-ink teacher-only">🚀 빠른 시작</button><button onclick="shareApp()" class="btn btn-ghost">🔗 다른 선생님께 알리기</button><button onclick="openHelp()" class="btn btn-ghost">❔ 도움말·단축키</button></div>`);
         }
         function openLanding() {
-            closeMenu(); closeModal();
+            closeMenu(); closeModal(); closeSlides();
             const all = allEvents(), n = Object.keys(all).length;
             ['ld-n', 'ld-n2', 'ld-s1'].forEach(id => $(id).textContent = n);
             const t = $('ld-today');
