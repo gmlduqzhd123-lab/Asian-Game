@@ -1,9 +1,18 @@
 // 📲 오프라인 지원: 한 번 접속하면 인터넷이 끊겨도 앱이 열려요.
 // 앱을 고쳐서 배포할 때는 CACHE 이름의 숫자를 올려 주세요.
-const CACHE = 'agpe-v24';
+const CACHE = 'agpe-v25';
 // 같은 주소(gmlduqzhd123-lab.github.io)의 다른 앱들과 저장소를 함께 쓰므로, 이 앱의 이전 캐시만 지운다.
 const CACHE_PREFIX = 'agpe-v';
-const CORE = ['./', './index.html', './manifest.webmanifest', './ys-install.js', './icons/icon-192.png', './icons/icon-512.png'];
+const THUMBS = [
+    './thumbs/archery.jpg', './thumbs/badminton.jpg', './thumbs/baseball.jpg', './thumbs/basketball.jpg',
+    './thumbs/breaking.jpg', './thumbs/equestrian.jpg', './thumbs/esports.jpg', './thumbs/fencing.jpg',
+    './thumbs/golf.jpg', './thumbs/gymnastics.jpg', './thumbs/handball.jpg', './thumbs/hurdle.jpg',
+    './thumbs/judo.jpg', './thumbs/longjump.jpg', './thumbs/pentathlon.jpg', './thumbs/relay.jpg',
+    './thumbs/roller.jpg', './thumbs/rowing.jpg', './thumbs/shooting.jpg', './thumbs/skateboard.jpg',
+    './thumbs/soccer.jpg', './thumbs/softtennis.jpg', './thumbs/swimming.jpg', './thumbs/tabletennis.jpg',
+    './thumbs/taekwondo.jpg', './thumbs/teqball.jpg', './thumbs/volleyball.jpg', './thumbs/weightlifting.jpg'
+];
+const CORE = ['./', './index.html', './manifest.webmanifest', './ys-install.js', './icons/icon-192.png', './icons/icon-512.png', ...THUMBS];
 
 self.addEventListener('install', e => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
