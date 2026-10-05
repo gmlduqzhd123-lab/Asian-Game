@@ -1,7 +1,7 @@
 // 📲 오프라인 지원: 한 번 접속하면 인터넷이 끊겨도 앱이 열려요.
 // 앱을 고쳐서 배포할 때는 CACHE 이름의 숫자를 올려 주세요.
-const CACHE = 'agpe-v22';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'agpe-v23';
+const CORE = ['./', './index.html', './manifest.webmanifest', './ys-install.js', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
     e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

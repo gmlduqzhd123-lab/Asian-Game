@@ -24,6 +24,7 @@
 
     <!-- 📱 앱처럼 설치 (홈 화면에 추가) -->
     <link rel="manifest" href="manifest.webmanifest">
+    <script src="ys-install.js"></script>
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -128,6 +129,8 @@
         .ld-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 1rem clamp(1rem, 3vw, 2.5rem); position: relative; z-index: 2; }
         .ld-pill { min-height: 2.75rem; padding: 0 1.1rem; border-radius: 999px; font-weight: 800; font-size: .92rem; color: #fff; background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(6px); }
         .ld-pill:hover { background: rgba(255,255,255,.26); }
+        .ld-pill { white-space: nowrap; }
+        @media (max-width: 519px) { .ld-wide { display: none; } .ld-pill { padding: 0 .8rem; } .ld-pill[data-qr] { display: none; } }   /* 휴대폰: QR은 이미 접속한 화면이라 숨김 */
         .ld-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem 1.25rem 2.5rem; position: relative; z-index: 2; }
         .ld-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem 1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.4); }
         .ld-badge i { width: .7rem; height: .7rem; border-radius: 999px; background: #FFE08A; box-shadow: 0 0 0 3px rgba(255,224,138,.35); }
@@ -269,7 +272,7 @@
         <div class="ld-float" aria-hidden="true"><span style="left:4%;top:30%">🏹</span><span style="right:7%;top:24%">⚽</span><span style="left:7%;bottom:22%">🏸</span><span style="right:9%;bottom:28%">🥋</span><span style="left:30%;top:9%" class="sm">🏅</span><span style="right:28%;bottom:9%" class="sm">🛼</span></div>
         <header class="ld-top">
             <div class="flex items-center gap-2.5"><img src="icons/icon-192.png" alt="" width="40" height="40" class="rounded-xl shadow-md"><div class="leading-tight"><span class="block text-[.7rem] font-bold opacity-85">엽쌤 체육</span><b class="font-display text-lg">아시안게임 체육 <span style="color:#FFE08A">수업</span></b></div></div>
-            <div class="flex gap-2"><button id="ld-install" onclick="installApp()" class="ld-pill hidden-tab">📲 앱 설치</button><button type="button" data-qr class="ld-pill" style="white-space:nowrap" aria-label="QR 코드로 접속">📱 QR</button><button onclick="closeLanding()" class="ld-pill">종목 목록 →</button></div>
+            <div class="flex gap-2"><button id="ld-install" type="button" data-ys-install class="ld-pill" aria-label="앱 설치"><span aria-hidden="true">📲</span>&nbsp;<span class="ld-wide">앱&nbsp;</span>설치</button><button type="button" data-qr class="ld-pill" style="white-space:nowrap" aria-label="QR 코드로 접속">📱 QR</button><button onclick="closeLanding()" class="ld-pill"><span class="ld-wide">종목 </span>목록 →</button></div>
         </header>
         <div class="ld-center">
             <span class="ld-badge"><i aria-hidden="true"></i>설치도 로그인도 없이, 지금 바로</span>
@@ -1488,7 +1491,6 @@
             const t = $('ld-today');
             if (db.lastAt) { const e = ev(); t.innerHTML = `▶ 이어서 하기 · <b>${esc(e.icon)} ${esc(e.name)}</b> (${esc(agoText(db.lastAt))})`; t.onclick = () => { closeLanding(false); chooseEvent(e.key); }; }
             else { const k = RECOMMENDED[new Date().getDate() % RECOMMENDED.length], e = normalizeEvent(all[k]); t.innerHTML = `⭐ 오늘의 추천 · <b>${esc(e.icon)} ${esc(e.name)} (${esc(e.sub)})</b>`; t.onclick = () => { closeLanding(false); chooseEvent(k); }; }
-            $('ld-install').classList.toggle('hidden-tab', !installEvt);
             $('landing').classList.remove('hidden-tab'); document.body.classList.add('landing'); $('landing').scrollTop = 0;
             setTimeout(() => { const c = $('landing').querySelector('.ld-cta'); if (c) c.focus({ preventScroll: true }); }, 30);
         }
@@ -1602,8 +1604,7 @@
         const fontLabel = () => ({ 1: '보통', 1.25: '크게', 1.5: '아주 크게' }[db.fontScale]);
 
         // ---------- ☰ 선생님 메뉴 ----------
-        let menuOpen = false, installEvt = null;
-        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; if (menuOpen) renderMenu(); });
+        let menuOpen = false;
         function renderMenu() {
             const items = [
                 ['🌈', '시작 화면 보기', 'openLanding()'],
@@ -1618,7 +1619,7 @@
                 ['⛶', '전체화면 (전자칠판)', 'toggleFullscreen()'],
                 ['🖨️', '지도안·학습지 인쇄', 'printPlan()'],
                 ['📋', '개인 기록·평가', 'openRecords()'],
-                ...(installEvt ? [['📲', '앱으로 설치하기', 'installApp()']] : []),
+                ...(window.YSInstall && !YSInstall.installed() ? [['📲', '앱으로 설치하기', 'installApp()']] : []),
                 ['❔', '도움말·단축키', 'openHelp()'],
                 ['⚙️', '설정', 'openSettings()']];
             $('menu').innerHTML = items.map(([i, t, fn, st]) => `<button role="menuitem" class="menu-item" onclick="${fn}"><span class="mi" aria-hidden="true">${i}</span><span>${t}</span>${st ? `<span class="state">${st}</span>` : ''}</button>`).join('');
@@ -1628,7 +1629,8 @@
         document.addEventListener('click', e => { if (menuOpen && !$('menu').contains(e.target) && !$('btn-menu').contains(e.target)) closeMenu(); });
         function toggleSound() { db.sound = !db.sound; save(); renderMenu(); if (db.sound) SFX.score(); toast(db.sound ? '🔊 효과음을 켰어요.' : '🔇 효과음을 껐어요.'); }
         function toggleVoice() { db.voice = !db.voice; save(); renderMenu(); if (db.voice) speak('음성 안내를 켰어요.'); else { stopSpeak(); toast('음성 안내를 껐어요.'); } }
-        async function installApp() { closeMenu(); if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; }
+        // 📲 바로 설치(크롬·엣지·삼성 인터넷) 또는 기기별 설치 방법 안내 — ys-install.js
+        function installApp() { closeMenu(); if (window.YSInstall) YSInstall.open(); }
 
         // ---------- 종목 선택 ----------
         function renderSelector() {
