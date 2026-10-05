@@ -1,6 +1,6 @@
 // 📲 오프라인 지원: 한 번 접속하면 인터넷이 끊겨도 앱이 열려요.
 // 앱을 고쳐서 배포할 때는 CACHE 이름의 숫자를 올려 주세요.
-const CACHE = 'agpe-v27';
+const CACHE = 'agpe-v28';
 // 같은 주소(gmlduqzhd123-lab.github.io)의 다른 앱들과 저장소를 함께 쓰므로, 이 앱의 이전 캐시만 지운다.
 const CACHE_PREFIX = 'agpe-v';
 const THUMBS = [
