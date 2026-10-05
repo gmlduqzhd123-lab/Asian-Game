@@ -277,12 +277,12 @@
         <div class="ld-center">
             <span class="ld-badge"><i aria-hidden="true"></i>설치도 로그인도 없이, 지금 바로</span>
             <p class="ld-kicker">오늘은 아시안게임 체육 시간! 🏅</p>
-            <h1 id="ld-title" class="ld-title font-display"><span>아시안게임</span><span>체육 수업 <em id="ld-n">32</em></span></h1>
-            <p class="ld-desc">양궁·축구·태권도부터 e스포츠, 스포츠클라이밍까지, 아시안게임 종목을<br class="hide-phone"> 교실·강당에서 바로 하는 <b>리드업 게임 <span id="ld-n2">32</span>가지</b>로 모았어요.</p>
+            <h1 id="ld-title" class="ld-title font-display"><span>아시안게임</span><span>체육 수업 <em id="ld-n">28</em></span></h1>
+            <p class="ld-desc">양궁·축구·태권도부터 e스포츠, 브레이킹까지, 아시안게임 종목을<br class="hide-phone"> 교실·강당에서 바로 하는 <b>리드업 게임 <span id="ld-n2">28</span>가지</b>로 모았어요.</p>
             <button onclick="closeLanding()" class="ld-cta">🏅 수업 시작하기 <span aria-hidden="true">→</span></button>
             <button id="ld-today" onclick="" class="ld-today"></button>
             <ul class="ld-stats" aria-label="한눈에 보기">
-                <li><b id="ld-s1">32</b><span>종목</span></li>
+                <li><b id="ld-s1">28</b><span>종목</span></li>
                 <li><b>6</b><span>수업 단계</span></li>
                 <li><b>4</b><span>언어 지원</span></li>
                 <li><b>0원</b><span>완전 무료</span></li>
@@ -324,7 +324,7 @@
             <div class="w-full max-w-6xl flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4 scroll-mt-32">
                 <div>
                     <h1 id="pick" class="font-display text-2xl sm:text-3xl md:text-4xl text-[#2E2A47]">🏅 오늘은 어떤 종목을 할까요?</h1>
-                    <p class="text-sm font-semibold text-[#6A6484] mt-1">아시안게임 32개 정식 종목으로 즐기는 신나는 교실·강당 리드업 게임</p>
+                    <p class="text-sm font-semibold text-[#6A6484] mt-1">아시안게임 28개 정식 종목으로 즐기는 신나는 교실·강당 리드업 게임</p>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                     <button onclick="pickRandomSport()" class="btn btn-mint text-sm shadow-sm font-bold" title="어떤 종목을 할지 랜덤으로 추천해요">🎲 오늘은 뭐 하지?</button>
@@ -887,59 +887,7 @@
                 mode: 'score', values: [1, 2, 3], unit: '점', btnLabel: '트릭 점수', timers: [30, 60],
                 warmup: [['🦩', '한 발 서기 좌우 10초'], ['🦘', '제자리 가볍게 점프']],
                 place: ['교실', '강당'], grades: ALL_GRADES, lowGear: true, quiet: false,
-                goal: '좁은 공간에서 균형을 유지하며 동작을 이어 표현할 수 있다.', reflect: '균형을 잃지 않게 도와준 몸의 부분은 어디였나요?' },
-            climbing: { group: 'record', name: '스포츠클라이밍', sub: '벽면 홀드 터치 트래버스', icon: '🧗', bgIcon: '🧗', guide: '발을 단단히 딛고 침착하게 다음 홀드를 찾으세요!', missionTitle: '벽면 홀드 터치 챌린지', colors: ['#0284c7', '#0f766e'],
-                gold: '2026 아이치·나고야 볼더링·리드 금메달(이도현·서채현) · 항저우 은3·동2',
-                gear: ['벽면에 붙일 번호 스티커 1~10 (또는 포스트잇)', '바닥 경계선 테이프', '안전 매트'],
-                rules: ['벽면에 1부터 10까지 높낮이가 다른 번호 스티커(홀드)를 붙입니다.', '두 발을 바닥 라인 위에 둔 채, 몸의 균형을 잡으며 1번부터 10번까지 순서대로 터치합니다.', '발이 바닥 선에서 떨어지거나 중심을 잃으면 탈락! 30초 동안 가장 많은 번호를 터치한 점수를 기록해요.'],
-                easy: [['🧱', '벽 앞에 서요'], ['👀', '1번 스티커를 찾아요'], ['✋', '순서대로 터치'], ['🔢', '터치한 번호 세기']],
-                easyTip: '스티커를 어깨 높이 근처로 모으고, 5번까지만 터치해요.',
-                hard: ['한 발로만 균형을 잡고 터치해요.', '거꾸로 10번부터 1번으로 역순 터치!'],
-                safety: ['벽을 타거나 점프하지 않아요. 발은 바닥에 둡니다.', '친구와 부딪히지 않게 한 명씩 차례대로 해요.'],
-                roles: [['클라이머 🧗', 0], ['루트 세터 🧱', 1], ['심판 📋', 1]],
-                mode: 'score', values: [1, 5], unit: '점', btnLabel: '홀드 터치', timers: [30, 60],
-                warmup: [['🖐️', '손가락 접었다 펴기 10번'], ['🙆', '양팔 위로 쭉 뻗어 어깨 스트레칭']],
-                place: ['교실', '강당'], grades: ALL_GRADES, lowGear: true, quiet: true,
-                goal: '균형 감각과 협응력을 발휘하여 정해진 목표를 차례대로 터치할 수 있다.', reflect: '몸의 균형이 흔들리지 않게 발을 어떻게 디뎠나요?' },
-            highjump: { group: 'record', name: '높이뛰기', sub: '탄력 고무줄 점프 도전', icon: '🦘', bgIcon: '🏃', guide: '리듬감 있는 스텝으로 힘차게 발을 굴러 도약하세요!', missionTitle: '스마일 탄력 점프 대결', colors: ['#ea580c', '#b45309'],
-                gold: '우상혁 아시안게임 은·세계선수권 금 · 2026 아이치·나고야 금메달 도전',
-                gear: ['늘어나는 부드러운 고무줄(또는 털실)', '콘 2개 (고무줄 걸이용)', '착지용 안전 매트'],
-                rules: ['콘 2개 사이에 탄력 고무줄을 1단계(발목) 높이로 걸고 착지 매트를 깝니다.', '도움닫기 후 한 발로 구르고 뛰어넘습니다. 고무줄이 몸에 걸려 떨어지지 않으면 성공!', '성공할 때마다 고무줄 높이를 2단계(무릎), 3단계(허벅지)로 올립니다. 팀원들의 최고 성공 점수를 합산해요.'],
-                easy: [['📏', '낮은 고무줄 앞에 서요'], ['🏃', '세 걸음 도움닫기'], ['🦘', '한 발로 힘껏 점프'], ['🙆', '두 발로 부드럽게 착지']],
-                easyTip: '고무줄을 넘지 않고 살짝 밟거나 건너뛰는 1단계부터 시작해요.',
-                hard: ['도움닫기 없이 제자리 점프로 넘어요.', '가위뛰기 동작으로 멋지게 착지해요.'],
-                safety: ['딱딱한 막대 대신 잘 늘어나는 안전 고무줄만 사용해요.', '착지할 때는 무릎을 살짝 굽혀 충격을 줄여요.'],
-                roles: [['점퍼 🦘', 0], ['바 높이 조절 📏', 1], ['안전 심판 🛡️', 1]],
-                mode: 'score', values: [1, 2, 3], unit: '단계', btnLabel: '성공', timers: [60],
-                warmup: [['🦵', '발목 및 무릎 돌리기'], ['🦘', '제자리 가볍게 점프 5번']],
-                place: ['강당', '운동장'], grades: ALL_GRADES, lowGear: false, quiet: false,
-                goal: '도움닫기 리듬을 살려 두려움을 극복하고 목표 높이를 뛰어넘을 수 있다.', reflect: '점프할 때 가장 높이 뛰어오른 순간은 언제였나요?' },
-            kabaddi: { group: 'combat', name: '카바디', sub: '숨참기 터치 술래잡기', icon: '🤝', bgIcon: '🏃', guide: '"카바디, 카바디!" 소리를 끊기지 않고 외치며 상대 진영을 공략하세요!', missionTitle: '전통 카바디 터치 배틀', colors: ['#d97706', '#92400e'],
-                gold: '아시안게임 전통 이색 종목 (한국 남자 카바디 아시안게임 은메달 쾌거)',
-                gear: ['바닥 중앙 라인 테이프', '팀 조끼'],
-                rules: ['코트 중앙선을 긋고 양 팀이 각자 진영에 섭니다.', '공격수(레이더) 1명이 "카바디, 카바디!"를 외치며 상대 진영으로 들어가 수비수를 터치하고 중앙선으로 돌아오면 1점!', '수비수는 몸을 부딪히지 않고 레이더를 부드럽게 에워싸 귀환을 막으면 수비 득점!', '레이더가 "카바디" 외치기를 멈추거나 숨을 들이쉬면 아웃! 공격과 수비를 번갈아 해요.'],
-                easy: [['🗣️', '"카바디"를 외쳐요'], ['🏃', '상대 진영으로'], ['✋', '살짝 터치하고'], ['⚡', '우리 진영으로 귀환']],
-                easyTip: '진영 크기를 좁히고 1:1 터치 게임으로 시작해요.',
-                hard: ['수비수가 손을 맞잡고 인간 벽을 만들어 막아요.', '제한 시간 20초 안에 돌아와야 해요.'],
-                safety: ['과격하게 잡거나 밀지 않고 손바닥 터치로만 플레이해요.', '바닥에 넘어지지 않도록 미끄럼 방지 양말/운동화를 착용해요.'],
-                roles: [['레이더(공격) 🏃', 0], ['안티(수비) 🛡️', 1], ['라인 심판 ⚖️', 1]],
-                mode: 'score', values: [1], unit: '점', btnLabel: '터치 성공', timers: [30, 60],
-                warmup: [['🗣️', '깊게 숨 쉬고 길게 소리내기'], ['👣', '좌우 빠른 사이드 스텝']],
-                place: ['강당', '운동장'], grades: ['3-4', '5-6'], lowGear: true, quiet: false,
-                goal: '협동하여 진형을 유지하고 민첩하게 공격과 수비를 전환할 수 있다.', reflect: '상대 공격수를 막기 위해 우리 팀은 어떤 대형을 만들었나요?' },
-            sepaktakraw: { group: 'net', name: '세팍타크로', sub: '풍선 발 제기차기 족구', icon: '🦶', bgIcon: '🎈', guide: '손은 쓰지 않고 발과 머리로 통통 튕겨 네트를 넘기세요!', missionTitle: '풍선 세팍타크로 랠리', colors: ['#10b981', '#047857'],
-                gold: '아시안게임 동남아 최고 인기 종목 (한국 남녀 세팍타크로 은·동메달 쾌거)',
-                gear: ['풍선 (또는 말랑한 스펀지공/소프트볼)', '네트용 줄 또는 책상 줄'],
-                rules: ['네트를 사이에 두고 양 팀 2~3명이 섭니다. 손과 팔은 절대 쓸 수 없어요!', '발 안쪽(인사이드), 발등, 무릎, 머리로 풍선을 띄워 상대 진영으로 넘깁니다.', '우리 팀 안에서 최대 3번까지 튕긴 뒤 넘길 수 있어요. 상대 진영 바닥에 떨어뜨리면 득점!'],
-                easy: [['🎈', '풍선을 띄워요'], ['🦶', '발이나 무릎으로 톡'], ['🤝', '친구에게 패스'], ['➡️', '네트 너머로 넘겨요']],
-                easyTip: '네트 없이 원형으로 서서 팀원끼리 발로 10번 연속 튕기기 챌린지를 해요.',
-                hard: ['머리로만 넘기기 도전!', '발 안쪽 킥으로만 랠리 이어가기.'],
-                safety: ['과도하게 높이 발을 차올리지 않아요.', '친구와 같은 공을 차려고 겹치지 않게 "내 공!" 콜사인을 외쳐요.'],
-                roles: [['킬러(공격) 🦶', 0], ['피더(세터) 🎈', 1], ['테커(서브) 🏃', 1]],
-                mode: 'score', values: [1], unit: '점', btnLabel: '득점', timers: [60, 120],
-                warmup: [['🦵', '고관절 및 다리 앞뒤 흔들기'], ['🦶', '제자리 제기차기 동작 10번']],
-                place: ['교실', '강당'], grades: ALL_GRADES, lowGear: true, quiet: false,
-                goal: '발과 신체 다양한 부위로 공을 조절하며 동료와 호흡을 맞출 수 있다.', reflect: '발로 공을 정확히 보내기 위해 가장 중요한 것은 무엇이었나요?' }
+                goal: '좁은 공간에서 균형을 유지하며 동작을 이어 표현할 수 있다.', reflect: '균형을 잃지 않게 도와준 몸의 부분은 어디였나요?' }
         };
 
         // 📺 종목별 추천 영상 (유튜브 주소). 누르면 앱 안에서 바로 재생돼요. 비어 있으면 유튜브 검색으로 연결돼요.
@@ -974,11 +922,7 @@
             pentathlon: [['🏅 성승민, 여자 근대5종 금메달! (2026)', YT('Vv_FDxfaNrA')], ['🏅 골인 직전 손 흔든 여유, 성승민 한국 첫 금 (2026)', YT('VTg_Gtz2Hgc')]],
             roller: [['🛼 롤러 금빛 질주, 최광호 금메달 (항저우)', YT('xc_9c-2x6_w')], TODAY_AG],
             esports: [['🎮 LoL 대표팀, 대만 꺾고 전승 2연패! (2026)', YT('ARj12aFRil4')], ['🎮 39·41·45세가 완성한 격투 게임 금메달 (2026)', YT('6sLxOQOJXJM')], ['🎮 리그 오브 레전드 대한민국 금메달! (항저우)', YT('Doj9KYkKds8')]],
-            skateboard: [['🛹 18세 강준이, 스케이트보드 결승 하이라이트 (2026)', YT('L5wzcHyUaVA')], ['🛹 강준이, 한국 스케이트보드 첫 금 (2026, MBC)', YT('bKE9ZbpD8Pg')]],
-            climbing: [['🧗 이도현, 스포츠클라이밍 환상의 볼더링 (항저우/나고야)', '아시안게임 스포츠클라이밍 이도현'], ['🧗 서채현, 완등을 향한 투혼 (스포츠클라이밍)', '아시안게임 스포츠클라이밍 서채현']],
-            highjump: [['🦘 우상혁, 스마일 점퍼 감동의 점프! (항저우)', YT('u1r8tni9vNY')], ['🦘 우상혁 높이뛰기 레전드 하이라이트', '우상혁 높이뛰기 하이라이트']],
-            kabaddi: [['🤝 카바디 하이라이트! 한국 vs 인도 명승부', '아시안게임 카바디 결승'], ['📘 3분 만에 배우는 카바디 규칙', '카바디 규칙 쉽게 알아보기']],
-            sepaktakraw: [['🦶 공중제비 킥! 세팍타크로 명장면 모음', '아시안게임 세팍타크로 명장면'], ['🦶 세팍타크로 한국 대표팀 하이라이트', '세팍타크로 대한민국']]
+            skateboard: [['🛹 18세 강준이, 스케이트보드 결승 하이라이트 (2026)', YT('L5wzcHyUaVA')], ['🛹 강준이, 한국 스케이트보드 첫 금 (2026, MBC)', YT('bKE9ZbpD8Pg')]]
         };
 
         const COMMON_WARMUP = [['🙆', '목 천천히 돌리기'], ['🤷', '어깨 크게 돌리기'], ['👐', '손목·발목 돌리기'], ['🦵', '무릎 굽혔다 펴기'], ['🙆‍♂️', '옆구리 늘리기'], ['🏃', '제자리 가볍게 뛰기']];
@@ -1042,7 +986,7 @@
     <!-- 📚 추가 데이터: 추천 종목 · 종목별 퀴즈 · 쉬운 규칙 번역 · 준비운동 시범 영상 -->
     <script>
         // ⭐ 처음 쓰는 선생님께 먼저 보여 줄 추천 종목 (준비물이 간단하고 교실·강당에서 바로 할 수 있어요)
-        const RECOMMENDED = ['archery', 'basketball', 'badminton', 'soccer', 'climbing', 'taekwondo', 'weightlifting', 'relay', 'breaking'];
+        const RECOMMENDED = ['archery', 'basketball', 'badminton', 'soccer', 'taekwondo', 'weightlifting', 'relay', 'breaking'];
 
         // 🎥 준비운동 따라 하기 영상 (누르면 앱 안에서 재생)
         const WARMUP_DEMOS = [
@@ -1165,23 +1109,7 @@
             skateboard: [
                 { q: '스케이트보드 "스트리트" 경기는 계단·난간 같은 도시 구조물에서 기술을 겨룬다.', a: true, e: '심사위원이 기술의 난이도와 완성도를 보고 점수를 줘요.' },
                 { q: '스케이트보드는 헬멧 없이 타도 안전하다.', a: false, e: '헬멧과 보호대를 꼭 착용해요.' },
-                { q: '스케이트보드는 올림픽과 아시안게임 정식 종목이다.', a: true, e: '도쿄 올림픽부터 정식 종목이 되었어요.' }],
-            climbing: [
-                { q: '스포츠클라이밍은 인공 벽을 오르는 경기이다.', a: true, e: '스피드, 볼더링, 리드 세부 종목이 있어요.' },
-                { q: '클라이밍 선수는 미끄러짐을 막기 위해 초크 가루를 손에 바른다.', a: true, e: '손에 땀을 흡수해 홀드를 꽉 잡을 수 있게 해 줘요.' },
-                { q: '교실 벽면 클라이밍 게임에서는 책상 위로 뛰어내려도 된다.', a: false, e: '절대 뛰어내리지 않고 두 발은 바닥 라인을 지켜요.' }],
-            highjump: [
-                { q: '높이뛰기에서는 가로대를 떨어뜨리지 않고 뛰어넘어야 한다.', a: true, e: '몸이 바에 닿아도 바가 떨어지지 않으면 성공이에요.' },
-                { q: '높이뛰기에서 뒤로 넘는 기술을 "배면뛰기(포스베리 플롭)"라고 한다.', a: true, e: '우상혁 선수 등 대부분의 선수가 배면뛰기를 써요.' },
-                { q: '고무줄 점프를 할 때는 두 발을 뻣뻣하게 펴고 착지한다.', a: false, e: '무릎을 살짝 굽혀 충격을 흡수해야 안전해요.' }],
-            kabaddi: [
-                { q: '카바디는 공격수가 "카바디"라고 계속 외쳐야 하는 스포츠이다.', a: true, e: '숨이 끊기지 않았다는 것을 소리로 증명해야 해요.' },
-                { q: '카바디는 공을 차서 골대에 넣는 경기이다.', a: false, e: '공 없이 상대 선수를 터치하고 돌아오는 술래잡기 격투 스포츠예요.' },
-                { q: '수비수를 터치할 때는 친구를 세게 밀쳐도 된다.', a: false, e: '손바닥으로 부드럽게 터치해야 안전해요.' }],
-            sepaktakraw: [
-                { q: '세팍타크로는 손과 팔을 사용해 공을 넘기는 스포츠이다.', a: false, e: '손과 팔은 쓸 수 없고 발, 머리, 무릎 등으로만 경기해요.' },
-                { q: '세팍타크로 공은 원래 등나무(라탄) 줄기를 엮어 만들었다.', a: true, e: '가볍고 탄성이 있는 특수한 공을 사용해요.' },
-                { q: '세팍타크로는 동남아시아에서 시작되어 아시안게임 정식 종목이 되었다.', a: true, e: '말레이시아, 태국 등에서 매우 인기 있는 스포츠예요.' }]
+                { q: '스케이트보드는 올림픽과 아시안게임 정식 종목이다.', a: true, e: '도쿄 올림픽부터 정식 종목이 되었어요.' }]
         };
 
         // 🌐 쉬운 규칙 그림 카드 번역 (다문화 학생용) — 순서는 각 종목 easy 카드와 같아요
@@ -1214,11 +1142,7 @@
             pentathlon: { en: ['Poke the target', 'Paddle on the board', 'Hit the cups', 'Run and high-five'], vi: ['Chạm vào mục tiêu', 'Nằm ván và khua tay', 'Ném trúng cốc', 'Chạy và đập tay'], zh: ['刺中目标', '趴在滑板上划', '打中纸杯', '跑回来击掌'] },
             roller: { en: ['Put your feet on the plates', 'Bend your knees', 'Push one foot at a time', 'All the way to the finish'], vi: ['Đặt chân lên đĩa giấy', 'Khuỵu gối', 'Đẩy từng chân một', 'Cố gắng đến vạch đích'], zh: ['把脚放在纸盘上', '弯曲膝盖', '一只脚一只脚地推', '坚持到终点'] },
             esports: { en: ['Pick a character and pilots', 'Show the arrow card', 'Move as you are told', 'Bring back the treasure'], vi: ['Chọn nhân vật và người điều khiển', 'Giơ thẻ mũi tên', 'Di chuyển theo lệnh', 'Mang kho báu về'], zh: ['选出角色和操控者', '举起方向卡', '按指令移动', '把宝物带回来'] },
-            skateboard: { en: ['Stand on the tape board', 'Stand on one foot', 'Jump in place', 'Finish with a cool pose'], vi: ['Đứng trên ván băng dính', 'Đứng một chân', 'Bật nhảy tại chỗ', 'Kết thúc bằng tư thế thật ngầu'], zh: ['站在胶带滑板上', '单脚站立', '原地跳', '摆出帅气的结束姿势'] },
-            climbing: { en: ['Stand before the wall', 'Find sticker number 1', 'Touch them in order', 'Count touched numbers'], vi: ['Đứng trước bức tường', 'Tìm miếng dán số 1', 'Chạm lần lượt theo thứ tự', 'Đếm các số đã chạm'], zh: ['站在墙面前', '找到1号贴纸', '按顺序触摸贴纸', '数一数触摸了几个'] },
-            highjump: { en: ['Stand before the band', 'Take 3 steps run-up', 'Jump high off one foot', 'Land softly on both feet'], vi: ['Đứng trước dây chun', 'Chạy đà ba bước', 'Dậm một chân bật cao', 'Tiếp đất êm bằng hai chân'], zh: ['站在橡皮筋前', '助跑三步', '单脚用力起跳', '双脚轻稳着地'] },
-            kabaddi: { en: ['Chant "Kabaddi, Kabaddi"', 'Enter their territory', 'Gently touch an opponent', 'Quickly return home safe'], vi: ['Hô vang "Kabaddi"', 'Tiến vào sân đối thủ', 'Chạm nhẹ vào đối phương', 'Nhanh chóng trở về vạch'], zh: ['连续喊"卡巴迪"', '进入对方半场', '轻轻触摸对手', '快速安全返回本方'] },
-            sepaktakraw: { en: ['Toss the balloon up', 'Tap with foot or knee', 'Pass to a teammate', 'Send it over the net'], vi: ['Tung bóng bay lên', 'Chạm bằng chân hoặc gối', 'Chuyền cho đồng đội', 'Đưa bóng qua lưới'], zh: ['把气球抛起来', '用脚或膝盖轻轻颠', '传球给同队伙伴', '把球打过网去'] }
+            skateboard: { en: ['Stand on the tape board', 'Stand on one foot', 'Jump in place', 'Finish with a cool pose'], vi: ['Đứng trên ván băng dính', 'Đứng một chân', 'Bật nhảy tại chỗ', 'Kết thúc bằng tư thế thật ngầu'], zh: ['站在胶带滑板上', '单脚站立', '原地跳', '摆出帅气的结束姿势'] }
         };
     </script>
 
@@ -1599,7 +1523,7 @@
             ['classroom', '🏫 교실'],
             ['gym', '🏟️ 강당·운동장'],
             ['lowGear', '🧻 도구 간단'],
-            ['all', '📚 전체 (32종목)']
+            ['all', '📚 전체 (28종목)']
         ];
         function setHomeFilter(f) { db.homeFilter = f; save(); renderHome(); }
         function onHomeSearch(v) {
@@ -1697,7 +1621,7 @@
                 classroom: '🏫 책상 사이나 좁은 교실에서도 안전하게 할 수 있는 종목이에요',
                 gym: '🏟️ 강당·체육관·운동장에서 마음껏 뛸 수 있는 종목이에요',
                 lowGear: '🧻 풍선, 종이컵 등 주변에 있는 간단한 도구로 할 수 있어요',
-                all: '📚 32개 정식 종목을 영역별로 모아 놓았어요'
+                all: '📚 28개 정식 종목을 영역별로 모아 놓았어요'
             }[f];
 
             $('home-body').innerHTML = `
@@ -1705,7 +1629,7 @@
                     <div class="flex flex-col md:flex-row items-stretch md:items-center gap-2.5">
                         <div class="relative flex-1 min-w-[220px]">
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-base" aria-hidden="true">🔍</span>
-                            <input id="home-search-input" type="search" value="${esc(homeSearch)}" oninput="onHomeSearch(this.value)" placeholder="종목 이름, 장소, 준비물 검색 (예: 클라이밍, 교실, 풍선)" class="form-input pl-10 pr-9 py-2 text-sm sm:text-base w-full rounded-2xl bg-white focus:ring-2 focus:ring-[#7C44D0]" aria-label="종목 검색">
+                            <input id="home-search-input" type="search" value="${esc(homeSearch)}" oninput="onHomeSearch(this.value)" placeholder="종목 이름, 장소, 준비물 검색 (예: 태권도, 교실, 풍선)" class="form-input pl-10 pr-9 py-2 text-sm sm:text-base w-full rounded-2xl bg-white focus:ring-2 focus:ring-[#7C44D0]" aria-label="종목 검색">
                             ${homeSearch ? `<button onclick="clearHomeSearch()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 font-bold" aria-label="검색 지우기">✕</button>` : ''}
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
@@ -2600,14 +2524,14 @@
             const placeBadges = (e.place || []).map(p => p === '교실' ? '🏫 교실' : (p === '강당' ? '🏟️ 강당' : (p === '운동장' ? '🏃 운동장' : p))).slice(0, 2).join(' · ');
 
             if (hasThumb) {
-                return `<button type="button" onclick="${onclick}" class="group text-left rounded-3xl p-0 transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl active:scale-[0.98] relative flex flex-col justify-between overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD23F] w-full ${selected ? 'ring-4 ring-[#FFD23F] shadow-xl' : ''}" style="aspect-ratio:228/130;box-shadow:0 10px 24px -10px ${b};background:${b}" aria-pressed="${!!selected}" aria-label="${esc(e.name)}: ${esc(e.sub)}, ${(e.place||[]).join('·')}">
+                return `<button type="button" onclick="${onclick}" class="group text-left rounded-3xl p-0 transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl active:scale-[0.98] relative flex flex-col justify-between overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD23F] w-full ${selected ? 'ring-4 ring-[#FFD23F] shadow-xl' : ''}" style="aspect-ratio:480/276;box-shadow:0 8px 20px -8px rgba(0,0,0,0.18);background:${b}" aria-pressed="${!!selected}" aria-label="${esc(e.name)}: ${esc(e.sub)}, ${(e.place||[]).join('·')}">
                     <img src="thumbs/${k}.jpg" alt="${esc(e.name)}" class="w-full h-full object-cover rounded-3xl transition-transform duration-300 group-hover:scale-105" loading="lazy">
                     ${selected ? '<span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full font-bold text-xs bg-[#FFD23F] text-[#2E2A47] shadow-md border border-white/60">선택됨 ✓</span>' : ''}
                     ${db.hidden.includes(k) ? '<span class="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md bg-black/75 text-white text-[11px] font-bold">🙈 숨김</span>' : ''}
                 </button>`;
             }
 
-            return `<button type="button" onclick="${onclick}" class="group text-left rounded-3xl p-4 text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] relative flex flex-col justify-between overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD23F] w-full ${selected ? 'ring-4 ring-[#FFD23F] shadow-lg' : ''}" style="aspect-ratio:228/130;background:linear-gradient(145deg, ${a}, ${b});box-shadow:0 12px 24px -12px ${b}" aria-pressed="${!!selected}">
+            return `<button type="button" onclick="${onclick}" class="group text-left rounded-3xl p-4 text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] relative flex flex-col justify-between overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD23F] w-full ${selected ? 'ring-4 ring-[#FFD23F] shadow-lg' : ''}" style="aspect-ratio:480/276;background:linear-gradient(145deg, ${a}, ${b});box-shadow:0 12px 24px -12px ${b}" aria-pressed="${!!selected}">
                 <div class="flex items-start justify-between gap-1 w-full">
                     <span class="text-3xl sm:text-4xl filter drop-shadow-sm transition-transform duration-200 group-hover:scale-110" aria-hidden="true">${esc(e.icon)}</span>
                     <div class="flex flex-col items-end gap-1">
