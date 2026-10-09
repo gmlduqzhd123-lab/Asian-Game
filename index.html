@@ -134,6 +134,13 @@
         .ld-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 1rem clamp(1rem, 3vw, 2.5rem); position: relative; z-index: 2; }
         .ld-pill { min-height: 2.75rem; padding: 0 1.1rem; border-radius: 999px; font-weight: 800; font-size: .92rem; color: #fff; background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(6px); }
         .ld-pill:hover { background: rgba(255,255,255,.26); }
+        .ld-bgm { position: fixed; right: clamp(.75rem, 2.5vw, 2rem); bottom: clamp(.75rem, 2.5vw, 1.75rem); z-index: 3; display: flex; align-items: center; gap: .5rem; padding: .35rem .8rem .35rem .35rem; border-radius: 999px; background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(8px); }
+        .ld-bgm-btn { width: 2.75rem; height: 2.75rem; border-radius: 999px; font-size: 1.25rem; background: #fff; color: #5B21B6; box-shadow: 0 6px 16px -8px rgba(76,29,149,.6); }
+        .ld-bgm-btn[aria-pressed="false"] { background: rgba(255,255,255,.35); }
+        .ld-bgm-vol { width: clamp(5.5rem, 14vw, 8rem); accent-color: #fff; height: 2.75rem; cursor: pointer; }
+        .ld-bgm-hint { position: absolute; right: 0; bottom: calc(100% + .5rem); white-space: nowrap; font-weight: 800; font-size: .85rem; padding: .4rem .8rem; border-radius: 999px; background: #fff; color: #5B21B6; box-shadow: 0 8px 20px -10px rgba(76,29,149,.6); animation: ldHint 1.6s ease-in-out infinite alternate; }
+        @keyframes ldHint { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+        @media (max-width: 639px) { .ld-center { padding-bottom: 8rem; } }
         .ld-pill { white-space: nowrap; }
         @media (max-width: 519px) { .ld-wide { display: none; } .ld-pill { padding: 0 .8rem; } .ld-pill[data-qr] { display: none; } }   /* 휴대폰: QR은 이미 접속한 화면이라 숨김 */
         .ld-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem 1.25rem 2.5rem; position: relative; z-index: 2; }
@@ -292,6 +299,13 @@
                 <li><b>4</b><span>언어 지원</span></li>
                 <li><b>0원</b><span>완전 무료</span></li>
             </ul>
+        </div>
+        <!-- 🎵 시작 화면 배경음악 (수업 시작하기를 누르면 멈춰요) -->
+        <div class="ld-bgm" role="group" aria-label="배경음악">
+            <span id="bgm-hint" class="ld-bgm-hint hidden-tab">🎵 화면을 한 번 누르면 음악이 나와요</span>
+            <button id="bgm-btn" type="button" onclick="bgmToggle()" class="ld-bgm-btn" aria-pressed="true" title="배경음악 켜기/끄기">🔊</button>
+            <label for="bgm-vol" class="sr-only">배경음악 음량</label>
+            <input id="bgm-vol" type="range" min="0" max="100" step="5" value="50" oninput="bgmSetVol(this.value)" class="ld-bgm-vol">
         </div>
     </section>
 
@@ -1212,7 +1226,7 @@
         }
         function defaultDb() {
             const cid = uid();
-            return { version: 2, sound: true, voice: true, voiceRate: 1, fontScale: 1, wuSec: 20, hidden: [], onboarded: false, lang: 'ko', quizSrc: 'all', remoteScore: false,
+            return { version: 2, bgmOn: true, bgmVol: 0.5, sound: true, voice: true, voiceRate: 1, fontScale: 1, wuSec: 20, hidden: [], onboarded: false, lang: 'ko', quizSrc: 'all', remoteScore: false,
                 level: 'normal', eventKey: 'archery', lessonLen: 40, teamPreset: 'color', teams: makeTeams('color', 2),
                 classes: [{ id: cid, name: '우리 반', names: store.get('student_names') || DEFAULT_NAMES }], classId: cid, byClass: {}, custom: {} };
         }
@@ -1496,6 +1510,44 @@
                 <div class="grid sm:grid-cols-2 gap-2.5 mb-5">${ABOUT_FEATS.map(([ic, bg, t, d]) => `<div class="feat"><span class="ic" style="background:${bg}" aria-hidden="true">${ic}</span><div><h3>${t}</h3><p>${d}</p></div></div>`).join('')}</div>
                 <div class="flex flex-wrap gap-2"><button onclick="closeModal(); openQuickStart(1)" class="btn btn-ink teacher-only">🚀 빠른 시작</button><button onclick="shareApp()" class="btn btn-ghost">🔗 다른 선생님께 알리기</button><button onclick="openHelp()" class="btn btn-ghost">❔ 도움말·단축키</button></div>`);
         }
+        // 🎵 시작 화면 배경음악: 들어오면 자동 재생(브라우저가 막으면 화면을 처음 누를 때), 수업 시작하기를 누르면 멈춰요
+        const BGM_SRC = 'audio/bgm-champions-of-tomorrow.mp3';
+        const bgm = { el: null, fade: null, armed: false };
+        const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        function bgmAudio() { if (!bgm.el) { const a = new Audio(BGM_SRC); a.loop = true; a.preload = 'auto'; bgm.el = a; } return bgm.el; }
+        const landingOpen = () => !$('landing').classList.contains('hidden-tab');
+        function bgmUi() {
+            const on = db.bgmOn !== false, v = Math.round((db.bgmVol ?? .5) * 100);
+            const b = $('bgm-btn'); b.textContent = !on ? '🔇' : v === 0 ? '🔈' : '🔊';
+            b.setAttribute('aria-pressed', on); b.setAttribute('aria-label', on ? '배경음악 끄기' : '배경음악 켜기');
+            const r = $('bgm-vol'); r.value = v; r.disabled = !on; r.classList.toggle('hidden-tab', IS_IOS); r.setAttribute('aria-valuetext', v + '%');
+        }
+        function bgmPlay() {
+            bgmUi();
+            if (db.bgmOn === false || !landingOpen()) return;
+            const a = bgmAudio(); clearInterval(bgm.fade); a.volume = db.bgmVol ?? .5;
+            let p; try { p = a.play(); } catch (e) { p = Promise.reject(e); }
+            if (p && p.then) p.then(() => $('bgm-hint').classList.add('hidden-tab'), () => { $('bgm-hint').classList.remove('hidden-tab'); bgmArm(); });
+        }
+        // 자동 재생이 막혔을 때: 시작 화면을 처음 누르거나 키를 누르면 재생 (수업 시작 버튼은 제외)
+        function bgmArm() {
+            if (bgm.armed) return; bgm.armed = true;
+            const go = ev => {
+                if (!landingOpen() || (ev.target && ev.target.closest && ev.target.closest('.ld-cta, .ld-today, .ld-bgm, [onclick^="closeLanding"]'))) return;
+                bgm.armed = false; ['pointerdown', 'keydown'].forEach(t => document.removeEventListener(t, go, true)); bgmPlay();
+            };
+            ['pointerdown', 'keydown'].forEach(t => document.addEventListener(t, go, true));
+        }
+        function bgmStop(fadeMs = 700) {
+            $('bgm-hint').classList.add('hidden-tab');
+            const a = bgm.el; if (!a || a.paused) return;
+            clearInterval(bgm.fade); const v0 = a.volume, steps = Math.max(1, Math.round(fadeMs / 50)); let i = 0;
+            bgm.fade = setInterval(() => { i++; a.volume = Math.max(0, v0 * (1 - i / steps)); if (i >= steps) { clearInterval(bgm.fade); a.pause(); a.currentTime = 0; a.volume = v0; } }, 50);
+        }
+        function bgmToggle() { db.bgmOn = db.bgmOn === false; save(); if (db.bgmOn) bgmPlay(); else { bgmStop(200); bgmUi(); } }
+        function bgmSetVol(v) { db.bgmVol = Math.max(0, Math.min(1, v / 100)); save(); if (bgm.el) bgm.el.volume = db.bgmVol; bgmUi(); if (db.bgmVol > 0 && bgm.el && bgm.el.paused && landingOpen() && db.bgmOn !== false) bgmPlay(); }
+        document.addEventListener('visibilitychange', () => { if (!bgm.el) return; if (document.hidden) bgm.el.pause(); else if (landingOpen() && db.bgmOn !== false) bgmPlay(); });
+
         function openLanding() {
             closeMenu(); closeModal(); closeSlides();
             const all = allEvents(), n = Object.keys(all).length;
@@ -1505,10 +1557,11 @@
             else { const k = RECOMMENDED[new Date().getDate() % RECOMMENDED.length], e = normalizeEvent(all[k]); t.innerHTML = `⭐ 오늘의 추천 · <b>${esc(e.icon)} ${esc(e.name)} (${esc(e.sub)})</b>`; t.onclick = () => { closeLanding(false); chooseEvent(k); }; }
             $('landing').classList.remove('hidden-tab'); document.body.classList.add('landing'); $('landing').scrollTop = 0;
             setTimeout(() => { const c = $('landing').querySelector('.ld-cta'); if (c) c.focus({ preventScroll: true }); }, 30);
+            bgmPlay();
         }
         function closeLanding(toHome = true) {
             if ($('landing').classList.contains('hidden-tab')) return;
-            $('landing').classList.add('hidden-tab'); document.body.classList.remove('landing');
+            $('landing').classList.add('hidden-tab'); document.body.classList.remove('landing'); bgmStop();
             try { sessionStorage.setItem('agpe_landed', '1'); } catch (e) {}
             if (toHome) { switchTab('home'); window.scrollTo({ top: 0 }); }
         }
