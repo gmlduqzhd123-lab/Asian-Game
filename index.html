@@ -134,16 +134,16 @@
         .ld-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 1rem clamp(1rem, 3vw, 2.5rem); position: relative; z-index: 2; }
         .ld-pill { min-height: 2.75rem; padding: 0 1.1rem; border-radius: 999px; font-weight: 800; font-size: .92rem; color: #fff; background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(6px); }
         .ld-pill:hover { background: rgba(255,255,255,.26); }
-        .ld-bgm { position: fixed; right: clamp(.75rem, 2.5vw, 2rem); bottom: clamp(.75rem, 2.5vw, 1.75rem); z-index: 95; display: flex; align-items: center; gap: .5rem; padding: .35rem .8rem .35rem .35rem; border-radius: 999px; background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(8px); }
+        .ld-bgm { position: fixed; right: clamp(.75rem, 2.5vw, 2rem); top: 5rem; z-index: 95; display: flex; align-items: center; gap: .5rem; padding: .35rem .8rem .35rem .35rem; border-radius: 999px; background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.45); backdrop-filter: blur(8px); }
         .ld-bgm-btn { width: 2.75rem; height: 2.75rem; border-radius: 999px; font-size: 1.25rem; background: #fff; color: #5B21B6; box-shadow: 0 6px 16px -8px rgba(76,29,149,.6); }
         .ld-bgm-btn[aria-pressed="false"] { background: rgba(255,255,255,.35); }
         .ld-bgm.light { background: rgba(255,255,255,.92); border-color: var(--line); box-shadow: var(--shadow); }
         .ld-bgm.light .ld-bgm-btn { background: #F3EDFA; box-shadow: none; } .ld-bgm.light .ld-bgm-vol { accent-color: var(--grape); }
         .ld-bgm.light .ld-bgm-hint { background: var(--grape); color: #fff; }
-        .ld-bgm-vol { width: clamp(5.5rem, 14vw, 8rem); accent-color: #fff; height: 2.75rem; cursor: pointer; }
-        .ld-bgm-hint { position: absolute; right: 0; bottom: calc(100% + .5rem); white-space: nowrap; font-weight: 800; font-size: .85rem; padding: .4rem .8rem; border-radius: 999px; background: #fff; color: #5B21B6; box-shadow: 0 8px 20px -10px rgba(76,29,149,.6); animation: ldHint 1.6s ease-in-out infinite alternate; }
+        .ld-bgm-vol { width: clamp(4.5rem, 14vw, 8rem); accent-color: #fff; height: 2.75rem; cursor: pointer; }
+        .ld-bgm-hint { position: absolute; right: 0; top: calc(100% + .5rem); white-space: nowrap; font-weight: 800; font-size: .85rem; padding: .4rem .8rem; border-radius: 999px; background: #fff; color: #5B21B6; box-shadow: 0 8px 20px -10px rgba(76,29,149,.6); animation: ldHint 1.6s ease-in-out infinite alternate; }
         @keyframes ldHint { from { transform: translateY(0); } to { transform: translateY(-4px); } }
-        @media (max-width: 639px) { .ld-center { padding-bottom: 8rem; } }
+        @media (max-width: 639px) { #landing .ld-center { padding-top: 4.5rem; justify-content: flex-start; } body.on-home:not(.landing) #tab-home { padding-top: 4.75rem; } #bgm-ctl.ld-bgm { padding: .25rem .6rem .25rem .25rem; } #bgm-ctl .ld-bgm-btn { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; } #bgm-ctl .ld-bgm-hint { top: 50%; right: calc(100% + .4rem); transform: translateY(-50%); animation: none; font-size: .8rem; padding: .35rem .7rem; } }
         .ld-pill { white-space: nowrap; }
         @media (max-width: 519px) { .ld-wide { display: none; } .ld-pill { padding: 0 .8rem; } .ld-pill[data-qr] { display: none; } }   /* 휴대폰: QR은 이미 접속한 화면이라 숨김 */
         .ld-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem 1.25rem 2.5rem; position: relative; z-index: 2; }
@@ -307,7 +307,7 @@
 
     <!-- 🎵 배경음악 (시작 화면·종목 고르기 화면에서만, 수업 단계로 들어가면 멈춰요) -->
     <div id="bgm-ctl" class="ld-bgm hidden-tab" role="group" aria-label="배경음악">
-        <span id="bgm-hint" class="ld-bgm-hint hidden-tab">🎵 화면을 한 번 누르면 음악이 나와요</span>
+        <span id="bgm-hint" class="ld-bgm-hint hidden-tab">🎵 화면을 <span class="hide-phone">한 번 </span>누르면 음악이 나와요</span>
         <button id="bgm-btn" type="button" onclick="bgmToggle()" class="ld-bgm-btn" aria-pressed="true" title="배경음악 켜기/끄기">🔊</button>
         <label for="bgm-vol" class="sr-only">배경음악 음량</label>
         <input id="bgm-vol" type="range" min="0" max="100" step="5" value="50" oninput="bgmSetVol(this.value)" class="ld-bgm-vol">
@@ -1522,9 +1522,17 @@
         function bgmAudio() { if (!bgm.el) { const a = new Audio(BGM_SRC); a.loop = true; a.preload = 'auto'; bgm.el = a; } return bgm.el; }
         const landingOpen = () => !$('landing').classList.contains('hidden-tab');
         const bgmWanted = () => landingOpen() || currentTab === 'home';
+        // 음악 조절 칸은 오른쪽 위 (시작 화면은 머리줄 아래, 종목 고르기 화면은 상단 메뉴 아래)
+        function bgmPlace() {
+            const c = $('bgm-ctl'); if (!c || c.classList.contains('hidden-tab')) return;
+            const a = landingOpen() ? document.querySelector('#landing .ld-top') : document.querySelector('nav');
+            const b = a ? a.getBoundingClientRect().bottom : 0;
+            c.style.top = Math.max(8, Math.round(b + 8)) + 'px';
+        }
+        window.addEventListener('resize', () => { try { bgmPlace(); } catch (e) {} });
         function bgmSync() {
             const c = $('bgm-ctl'); if (!c) return;
-            c.classList.toggle('hidden-tab', !bgmWanted()); c.classList.toggle('light', !landingOpen());
+            c.classList.toggle('hidden-tab', !bgmWanted()); c.classList.toggle('light', !landingOpen()); bgmPlace();
             if (bgmWanted()) bgmPlay(); else bgmStop();
         }
         function bgmUi() {
