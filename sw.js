@@ -1,6 +1,6 @@
 // 📲 오프라인 지원: 한 번 접속하면 인터넷이 끊겨도 앱이 열려요.
 // 앱을 고쳐서 배포할 때는 CACHE 이름의 숫자를 올려 주세요.
-const CACHE = 'agpe-v29';
+const CACHE = 'agpe-v30';
 // 같은 주소(gmlduqzhd123-lab.github.io)의 다른 앱들과 저장소를 함께 쓰므로, 이 앱의 이전 캐시만 지운다.
 const CACHE_PREFIX = 'agpe-v';
 const THUMBS = [
@@ -33,6 +33,8 @@ self.addEventListener('fetch', e => {
         return;
     }
     // 같은 사이트 파일과 글꼴만 저장 (유튜브 등은 저장하지 않음)
+    // 배경음악은 큰 파일이라 저장하지 않고 그때그때 받아요 (구간 요청도 그대로 전달)
+    if (url.pathname.includes('/audio/') || req.headers.has('range')) return;
     const cacheable = url.origin === self.location.origin || /(^|\.)fonts\.(googleapis|gstatic)\.com$|(^|\.)cdn\.jsdelivr\.net$/.test(url.hostname);
     if (!cacheable) return;
     e.respondWith(caches.match(req).then(hit => {
