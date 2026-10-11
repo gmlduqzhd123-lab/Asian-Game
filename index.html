@@ -145,7 +145,9 @@
         @keyframes ldHint { from { transform: translateY(0); } to { transform: translateY(-4px); } }
         @media (max-width: 639px) { #landing .ld-center { padding-top: 4.5rem; justify-content: flex-start; } body.on-home:not(.landing) #tab-home { padding-top: 4.75rem; } #bgm-ctl.ld-bgm { padding: .25rem .6rem .25rem .25rem; } #bgm-ctl .ld-bgm-btn { width: 2.5rem; height: 2.5rem; font-size: 1.1rem; } #bgm-ctl .ld-bgm-hint { top: 50%; right: calc(100% + .4rem); transform: translateY(-50%); animation: none; font-size: .8rem; padding: .35rem .7rem; } }
         .ld-pill { white-space: nowrap; }
-        @media (max-width: 519px) { .ld-wide { display: none; } .ld-pill { padding: 0 .8rem; } .ld-top { flex-wrap: wrap; row-gap: 10px; } .ld-top > .flex:last-child { width: 100%; justify-content: flex-end; } }   /* 휴대폰: 제목 아래 줄에 설치·QR·목록 */
+        .ld-actions, .ld-key { display: flex; gap: .5rem; align-items: center; }
+        /* 휴대폰: 맨 윗줄 = 제목 + 설치·QR, 둘째 줄 = 목록 */
+        @media (max-width: 519px) { .ld-wide { display: none; } .ld-pill { padding: 0 .8rem; } .ld-top { flex-wrap: wrap; row-gap: 10px; column-gap: .5rem; padding-left: .75rem; padding-right: .75rem; } .ld-actions { display: contents; } .ld-key { gap: .375rem; } .ld-key .ld-pill { min-height: 2.25rem; padding: 0 .55rem; font-size: .84rem; } .ld-more { margin-left: auto; } .ld-top img { width: 34px; height: 34px; } .ld-top b.font-display { font-size: .94rem; } .ld-top > div:first-child { gap: .4rem; min-width: 0; } }
         .ld-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem 1.25rem 2.5rem; position: relative; z-index: 2; }
         .ld-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem 1rem; border-radius: 999px; font-weight: 800; font-size: .9rem; background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.4); }
         .ld-badge i { width: .7rem; height: .7rem; border-radius: 999px; background: #FFE08A; box-shadow: 0 0 0 3px rgba(255,224,138,.35); }
@@ -287,7 +289,7 @@
         <div class="ld-float" aria-hidden="true"><span style="left:4%;top:30%">🏹</span><span style="right:7%;top:24%">⚽</span><span style="left:7%;bottom:22%">🏸</span><span style="right:9%;bottom:28%">🥋</span><span style="left:30%;top:9%" class="sm">🏅</span><span style="right:28%;bottom:9%" class="sm">🛼</span></div>
         <header class="ld-top">
             <div class="flex items-center gap-2.5"><img src="icons/icon-192.png" alt="" width="40" height="40" class="rounded-xl shadow-md"><div class="leading-tight"><span class="block text-[.7rem] font-bold opacity-85">엽쌤 체육</span><b class="font-display text-lg">아시안게임 체육 <span style="color:#FFE08A">수업</span></b></div></div>
-            <div class="flex gap-2"><button id="ld-install" type="button" data-ys-install class="ld-pill" aria-label="앱 설치"><span aria-hidden="true">📲</span>&nbsp;<span class="ld-wide">앱&nbsp;</span>설치</button><button type="button" data-qr class="ld-pill" style="white-space:nowrap" aria-label="QR 코드로 접속">📱 QR</button><button onclick="closeLanding()" class="ld-pill"><span class="ld-wide">종목 </span>목록 →</button></div>
+            <div class="ld-actions"><div class="ld-key"><button id="ld-install" type="button" data-ys-install class="ld-pill" aria-label="앱 설치"><span aria-hidden="true">📲</span>&nbsp;<span class="ld-wide">앱&nbsp;</span>설치</button><button type="button" data-qr class="ld-pill" style="white-space:nowrap" aria-label="QR 코드로 접속">📱 QR</button></div><button onclick="closeLanding()" class="ld-pill ld-more"><span class="ld-wide">종목 </span>목록 →</button></div>
         </header>
         <div class="ld-center">
             <span class="ld-badge"><i aria-hidden="true"></i>설치도 로그인도 없이, 지금 바로</span>
